@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
@@ -74,11 +75,14 @@ public class Controler {
             String motDePasse = Utils.hashPassword(Arrays.toString(mdp));
 
             utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
-            Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
-            signUp.dispose();
-
-            mainView = new MainView();
-            init();
+            try {
+                Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
+                signUp.dispose();
+                mainView = new MainView();
+                init();
+            } catch (SQLException | ClassNotFoundException e1) {
+                e1.printStackTrace();
+            }
         });
     }
 

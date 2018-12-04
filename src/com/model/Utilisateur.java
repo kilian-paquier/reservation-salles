@@ -1,5 +1,6 @@
 package com.model;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Utilisateur {
@@ -66,5 +67,9 @@ public class Utilisateur {
         // Push dans la BDD
     }
 
-
+    public void deleteReservation(String nomSalle, LocalDateTime debut) {
+        for (Reservation reservation : reservations) {
+            if (reservation.getSalle().getNomSalle().equals(nomSalle));
+        }
+    }
 }
