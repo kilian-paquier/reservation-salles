@@ -24,6 +24,7 @@ public class Controler {
     private Connexion connexion;
 
     public Controler() {
+        Utils.connection();
         opening();
     }
 
@@ -49,10 +50,15 @@ public class Controler {
             String mail = connexion.getMailField().getText();
             String mdp = Utils.hashPassword(Arrays.toString(connexion.getMdpField().getPassword()));
 
-
-            mainView = new MainView();
-            init();
-            mainView.open();
+            utilisateur = Utils.connectUser(mail, mdp);
+            if (utilisateur == null)
+                JOptionPane.showMessageDialog(null, "Mot de passe ou mail invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+            else {
+                mainView = new MainView();
+                init();
+                mainView.open();
+                connexion.dispose();
+            }
         });
 
         connexion.open();
@@ -69,7 +75,17 @@ public class Controler {
 
     private void actionForgot() {
         ForgotPassword forgotPassword = new ForgotPassword();
-
+        forgotPassword.getForgotButton().addActionListener(e -> {
+            String mail = forgotPassword.getMailField().getText();
+            System.out.println(Utils.getPassword(mail));
+        });
+        forgotPassword.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                connexion.setVisible(true);
+            }
+        });
+        forgotPassword.open();
     }
 
     private void actionSignUp() {
@@ -84,12 +100,13 @@ public class Controler {
             utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
             try {
                 Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
+
                 signUp.dispose();
                 mainView = new MainView();
                 init();
                 mainView.open();
-            } catch (SQLException | ClassNotFoundException e1) {
-                JOptionPane.showMessageDialog(null, e1.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException e1) {
+                JOptionPane.showMessageDialog(null, "L'email est déjà utilisé par un autre utilisateur", "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 

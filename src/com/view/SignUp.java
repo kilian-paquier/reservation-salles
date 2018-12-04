@@ -17,7 +17,7 @@ public class SignUp extends JFrame {
 
     public void open() {
         pack();
-        setSize(500,500);
+        setSize(400,500);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);

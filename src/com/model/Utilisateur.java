@@ -1,6 +1,7 @@
 package com.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Utilisateur {
@@ -15,6 +16,7 @@ public class Utilisateur {
         this.nom = nom;
         this.mail = mail;
         this.motdepasse = motdepasse;
+        reservations = new ArrayList<>();
     }
 
     public String getPrenom() {

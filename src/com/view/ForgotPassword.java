@@ -12,6 +12,14 @@ public class ForgotPassword extends JFrame {
         setTitle("Mot de passe oublié");
     }
 
+    public void open() {
+        pack();
+        setSize(400,150);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
     public JTextField getMailField() {
         return mailField;
     }

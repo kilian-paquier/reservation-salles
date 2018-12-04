@@ -1,14 +1,15 @@
 package com.model;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 
 public class Reservation {
     private Utilisateur utilisateur;
     private Salle salle;
-    private LocalDateTime dateDebut;
-    private LocalDateTime dateFin;
+    private Date dateDebut;
+    private Date dateFin;
 
-    public Reservation(Utilisateur utilisateur, Salle salle, LocalDateTime dateDebut, LocalDateTime dateFin) {
+    public Reservation(Utilisateur utilisateur, Salle salle, Date dateDebut, Date dateFin) {
         this.utilisateur = utilisateur;
         this.salle = salle;
         this.dateDebut = dateDebut;
@@ -23,19 +24,19 @@ public class Reservation {
         return salle;
     }
 
-    public LocalDateTime getDateDebut() {
+    public Date getDateDebut() {
         return dateDebut;
     }
 
-    public void setDateDebut(LocalDateTime dateDebut) {
+    public void setDateDebut(Date dateDebut) {
         this.dateDebut = dateDebut;
     }
 
-    public LocalDateTime getDateFin() {
+    public Date getDateFin() {
         return dateFin;
     }
 
-    public void setDateFin(LocalDateTime dateFin) {
+    public void setDateFin(Date dateFin) {
         this.dateFin = dateFin;
     }
 

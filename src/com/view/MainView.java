@@ -21,7 +21,11 @@ public class MainView extends JFrame {
     }
 
     public void open() {
-
+        pack();
+        setSize(750,600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     public JList<String> getListSalle() {
