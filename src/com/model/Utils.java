@@ -3,7 +3,6 @@ package com.model;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public abstract class Utils {
 
     /**
      * creates the tables in database
-     *
+     * <p>
      * needs to be used only once !!!
      */
     public static void createTables() {
@@ -68,17 +67,19 @@ public abstract class Utils {
 
         } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
-        }finally{
+        } finally {
             //finally block used to close resources
-            try{
-                if(stmt!=null)
+            try {
+                if (stmt != null)
                     conn.close();
-            }catch(SQLException se){
-            }// do nothing
-            try{
-                if(conn!=null)
+            }
+            catch (SQLException ignored) {
+
+            }
+            try {
+                if (conn != null)
                     conn.close();
-            }catch(SQLException se){
+            } catch (SQLException se) {
                 se.printStackTrace();
             }//end finally try
         }//end try
@@ -87,7 +88,8 @@ public abstract class Utils {
 
     /**
      * registers a new user in the database
-     * @param nom the name of the user
+     *
+     * @param nom    the name of the user
      * @param prenom the firstname of the user
      */
     public static void registerUser(String nom, String prenom, String mail, String password) throws SQLException, ClassNotFoundException {
@@ -95,15 +97,15 @@ public abstract class Utils {
         Statement statement;
 
 
-            Class.forName(JDBC_DRIVER);
-            connection = DriverManager.getConnection(DB_URL, USER, "");
-            statement = connection.createStatement();
+        Class.forName(JDBC_DRIVER);
+        connection = DriverManager.getConnection(DB_URL, USER, "");
+        statement = connection.createStatement();
 
-            String sql = "INSERT INTO USER(Mail_user, Nom_user, Prenom_user, mail, Password) VALUES('"+ mail +"','"+ nom +"','"+ prenom +"','"+ password +"')";
-            statement.executeUpdate(sql);
+        String sql = "INSERT INTO USER(Mail_user, Nom_user, Prenom_user, mail, Password) VALUES('" + mail + "','" + nom + "','" + prenom + "','" + password + "')";
+        statement.executeUpdate(sql);
 
-            statement.close();
-            connection.close();
+        statement.close();
+        connection.close();
 
     }
 
@@ -116,11 +118,11 @@ public abstract class Utils {
             connection = DriverManager.getConnection(DB_URL, USER, "");
             statement = connection.createStatement();
 
-            String sql = "SELECT * FROM USER WHERE Mail = "+ mail + " AND Password = "+ password;
+            String sql = "SELECT * FROM USER WHERE Mail = " + mail + " AND Password = " + password;
             ResultSet set = statement.executeQuery(sql);
 
-            while(set.next())
-                user = new Utilisateur(set.getString(2),set.getString(1),set.getString(0),set.getString(3));
+            while (set.next())
+                user = new Utilisateur(set.getString(2), set.getString(1), set.getString(0), set.getString(3));
             return user;
 
         } catch (Exception e) {
@@ -152,7 +154,6 @@ public abstract class Utils {
     public static List<LocalDateTime> getDispoSalle(int id_salle) {
 
 
-
         return null;
     }
 
@@ -162,8 +163,7 @@ public abstract class Utils {
             md.update(password.getBytes());
             byte[] bytes = md.digest();
             StringBuilder sb = new StringBuilder();
-            for(int i=0; i< bytes.length ;i++)
-            {
+            for (int i = 0; i < bytes.length; i++) {
                 sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
             }
             return sb.toString();
