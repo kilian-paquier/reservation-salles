@@ -90,11 +90,11 @@ public abstract class Utils {
      * @param nom the name of the user
      * @param prenom the firstname of the user
      */
-    public static void registerUser(String nom, String prenom, String mail, String password) {
+    public static void registerUser(String nom, String prenom, String mail, String password) throws SQLException, ClassNotFoundException {
         Connection connection;
         Statement statement;
 
-        try {
+
             Class.forName(JDBC_DRIVER);
             connection = DriverManager.getConnection(DB_URL, USER, "");
             statement = connection.createStatement();
@@ -104,9 +104,7 @@ public abstract class Utils {
 
             statement.close();
             connection.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
     }
 
     public static Utilisateur connectUser(String mail, String password) {
