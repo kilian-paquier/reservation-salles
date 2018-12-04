@@ -5,6 +5,8 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Utils {
@@ -47,10 +49,10 @@ public abstract class Utils {
             //Creation Reservation
             String sql1 = "CREATE TABLE RESERVATION " +
                     "(Id_salle INTEGER not NULL, " +
-                    " Id_user INTEGER not NULL, " +
+                    " Mail_user VARCHAR(255) not NULL, " +
                     " Date_debut DATE, " +
                     " Date_fin DATE, " +
-                    " PRIMARY KEY ( Id_salle, Id_user ))";
+                    " PRIMARY KEY ( Id_salle, Mail_user ))";
 
             stmt.executeUpdate(sql1);
             System.out.println("Created table in given database...");
@@ -121,16 +123,39 @@ public abstract class Utils {
 
             while(set.next())
                 user = new Utilisateur(set.getString(2),set.getString(1),set.getString(0),set.getString(3));
-            return user;
 
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
-
+        return user;
     }
 
-    public static ResultSet checkReservationSalles(int id_salle) {
+    public static List<LocalTime> checkDispoDebutSalle(int id_salle, LocalDate date) {
+        Connection connection;
+        Statement statement;
+        List<LocalTime> dates_dispos = new ArrayList<>();
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            connection = DriverManager.getConnection(DB_URL, USER, "");
+            statement = connection.createStatement();
+
+            String sql = "SELECT Date_debut, Date_fin FROM RESERVATION WHERE Id_salle = " + id_salle +" AND Date_debut Like"+ date;
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * reservation d'une salle
+     * Le début et la fin de réservation sont traités en précondition
+     * post-condition : ajouter reservation dans l'utilisateur après l'appel de cette fonction
+     * @param reservation la réservation a effectuer
+     */
+    public static void reserveSalle(Reservation reservation) {
         Connection connection;
         Statement statement;
 
@@ -139,23 +164,41 @@ public abstract class Utils {
             connection = DriverManager.getConnection(DB_URL, USER, "");
             statement = connection.createStatement();
 
-            String sql = "SELECT Date_debut, Date_fin FROM RESERVATION WHERE Id_salle = " + id_salle;
-            return statement.executeQuery(sql);
+            String sql = "INSERT INTO RESERVATION VALUES('"+ reservation.getSalle().getId() +"',"+ reservation.getUtilisateur().getMail() +
+                    "','"+ reservation.getDateDebut() +"','"+ reservation.getDateFin() +")";
+            statement.executeUpdate(sql);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
-
     }
 
-    public static List<LocalDateTime> getDispoSalle(int id_salle) {
+    /**
+     * post-condition : supprimer reservation de l'utilisateur après l'appel de cette fonction
+     * @param reservation la reservation a supprimer
+     */
+    public static void annulerReservationSalle(Reservation reservation) {
+        Connection connection;
+        Statement statement;
 
+        try {
+            Class.forName(JDBC_DRIVER);
+            connection = DriverManager.getConnection(DB_URL, USER, "");
+            statement = connection.createStatement();
 
+            String sql = "DELETE FROM RESERVATION WHERE Id_salle = "+ reservation.getSalle().getId() +" AND Mail_user = "+ reservation.getUtilisateur().getMail();
+            statement.executeUpdate(sql);
 
-        return null;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    /**
+     * chiffre le mot de passe utilisateur
+     * @param password le mot de pass à chiffrer
+     * @return le mot de pass chiffré
+     */
     public static String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
