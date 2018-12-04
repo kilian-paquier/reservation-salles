@@ -60,4 +60,11 @@ public class Utilisateur {
         }
         return null;
     }
+
+    public void addReservation(Reservation reservation) {
+        reservations.add(reservation);
+        // Push dans la BDD
+    }
+
+
 }

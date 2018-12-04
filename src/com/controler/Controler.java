@@ -12,6 +12,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 public class Controler {
@@ -112,9 +113,11 @@ public class Controler {
     }
 
     private void deleteReservation() {
-        String nomSalle = String.valueOf(mainView.getReservationBox().getSelectedItem()).split("le")[0];
+        String[] reservation = String.valueOf(mainView.getReservationBox().getSelectedItem()).split("le");
+        String nomSalle = reservation[0];
         nomSalle = nomSalle.trim();
-        Salle salle = utilisateur.getSalle(nomSalle);
+        String dateDebut = reservation[1];
+
 
     }
 
