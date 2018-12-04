@@ -20,6 +20,10 @@ public class MainView extends JFrame {
         setTitle("Gestion des réservations");
     }
 
+    public void open() {
+
+    }
+
     public JList<String> getListSalle() {
         return listSalle;
     }

@@ -69,7 +69,11 @@ public class Utilisateur {
 
     public void deleteReservation(String nomSalle, LocalDateTime debut) {
         for (Reservation reservation : reservations) {
-            if (reservation.getSalle().getNomSalle().equals(nomSalle));
+            if (reservation.getSalle().getNomSalle().equals(nomSalle) && reservation.getDateDebut().equals(debut)) {
+                reservations.remove(reservation);
+                // Appel BDD
+                break;
+            }
         }
     }
 }
