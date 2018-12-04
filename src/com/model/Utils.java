@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public abstract class Utils {
 
@@ -108,6 +109,29 @@ public abstract class Utils {
         }
     }
 
+    public static Utilisateur connectUser(String mail, String password) {
+        Connection connection;
+        Statement statement;
+        Utilisateur user = null;
+        try {
+            Class.forName(JDBC_DRIVER);
+            connection = DriverManager.getConnection(DB_URL, USER, "");
+            statement = connection.createStatement();
+
+            String sql = "SELECT * FROM USER WHERE Mail = "+ mail + " AND Password = "+ password;
+            ResultSet set = statement.executeQuery(sql);
+
+            while(set.next())
+                user = new Utilisateur(set.getString(2),set.getString(1),set.getString(0),set.getString(3));
+            return user;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
     public static ResultSet checkReservationSalles(int id_salle) {
         Connection connection;
         Statement statement;
@@ -125,6 +149,13 @@ public abstract class Utils {
             return null;
         }
 
+    }
+
+    public static List<LocalDateTime> getDispoSalle(int id_salle) {
+
+
+
+        return null;
     }
 
     public static String hashPassword(String password) {
