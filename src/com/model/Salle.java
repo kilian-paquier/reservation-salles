@@ -1,4 +1,5 @@
 package com.model;
 
-public class User {
+public class Salle {
+
 }
