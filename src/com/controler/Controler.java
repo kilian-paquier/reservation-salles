@@ -1,6 +1,9 @@
 package com.controler;
 
+import com.model.Reservation;
+import com.model.Salle;
 import com.model.Utilisateur;
+import com.model.Utils;
 import com.view.Connexion;
 import com.view.MainView;
 import com.view.SignUp;
@@ -13,6 +16,7 @@ import java.util.Arrays;
 
 public class Controler {
     private MainView mainView;
+    private Utilisateur utilisateur;
 
     public Controler(String title) {
         opening();
@@ -38,11 +42,21 @@ public class Controler {
 
         connexion.getSeConnecterButton().addActionListener(e -> {
             String mail = connexion.getMailField().getText();
-            String mdp = Arrays.toString(connexion.getMdpField().getPassword()); // Mettre en MD5
+            String mdp = Utils.hashPassword(Arrays.toString(connexion.getMdpField().getPassword()));
 
 
             mainView = new MainView();
+            init();
         });
+    }
+
+    private void init() {
+        initListReservations();
+        initListSalles();
+        initReservations();
+
+        mainView.getDeleteReservation().addActionListener(e -> deleteReservation());
+        mainView.getAddReservation().addActionListener(e -> addReservation());
     }
 
     private void actionForgot() {
@@ -56,19 +70,23 @@ public class Controler {
             String nom = signUp.getNomField().getText();
             String mail = signUp.getMailField().getText();
             char[] mdp = signUp.getMdpField().getPassword();
-            String motDePasse = Arrays.toString(mdp); // Mettre en MD5
+            String motDePasse = Utils.hashPassword(Arrays.toString(mdp));
 
-            Utilisateur utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
-            // Mettre dans la BDD
+            utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
+            Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
             signUp.dispose();
-            opening();
+
+            mainView = new MainView();
+            init();
         });
     }
 
     private void initListSalles() {
-        DefaultListModel defaultListModel = new DefaultListModel();
+        DefaultListModel<String> defaultListModel = new DefaultListModel<>();
 
+        // Faire liste
 
+        mainView.getListSalle().setModel(defaultListModel);
     }
 
     private void initListReservations() {
@@ -79,6 +97,30 @@ public class Controler {
             }
         };
 
+        defaultTableModel.addColumn("Utilisateur");
+        defaultTableModel.addColumn("Salle");
+        defaultTableModel.addColumn("Début");
+        defaultTableModel.addColumn("Fin");
 
+        // Faire liste
+
+        mainView.getTableReservations().setModel(defaultTableModel);
+    }
+
+    private void addReservation() {
+
+    }
+
+    private void deleteReservation() {
+        String nomSalle = String.valueOf(mainView.getReservationBox().getSelectedItem()).split("le")[0];
+        nomSalle = nomSalle.trim();
+        Salle salle = utilisateur.getSalle(nomSalle);
+
+    }
+
+    private void initReservations() {
+        for (Reservation reservation : utilisateur.getReservations()) {
+            mainView.getReservationBox().addItem(reservation.toString());
+        }
     }
 }

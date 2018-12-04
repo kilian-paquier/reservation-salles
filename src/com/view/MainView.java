@@ -4,22 +4,23 @@ import javax.swing.*;
 
 public class MainView extends JFrame {
     private JPanel globalPanel;
-    private JList listSalle;
+    private JList<String> listSalle;
     private JTable tableReservations;
-    private JComboBox boxSalle;
-    private JComboBox boxJourDebut;
-    private JComboBox boxJourFin;
+    private JComboBox<String> boxSalle;
+    private JComboBox<String> boxJourDebut;
+    private JComboBox<String> boxJourFin;
     private JButton addReservation;
-    private JComboBox boxHeureDebut;
-    private JComboBox boxHeureFin;
-    private JComboBox reservationBox;
+    private JComboBox<String> boxHeureDebut;
+    private JComboBox<String> boxHeureFin;
+    private JComboBox<String> reservationBox;
+    private JButton deleteReservation;
 
     public MainView() {
         setContentPane(globalPanel);
         setTitle("Gestion des réservations");
     }
 
-    public JList getListSalle() {
+    public JList<String> getListSalle() {
         return listSalle;
     }
 
@@ -27,15 +28,15 @@ public class MainView extends JFrame {
         return tableReservations;
     }
 
-    public JComboBox getBoxSalle() {
+    public JComboBox<String> getBoxSalle() {
         return boxSalle;
     }
 
-    public JComboBox getBoxJourDebut() {
+    public JComboBox<String> getBoxJourDebut() {
         return boxJourDebut;
     }
 
-    public JComboBox getBoxJourFin() {
+    public JComboBox<String> getBoxJourFin() {
         return boxJourFin;
     }
 
@@ -43,15 +44,19 @@ public class MainView extends JFrame {
         return addReservation;
     }
 
-    public JComboBox getBoxHeureDebut() {
+    public JComboBox<String> getBoxHeureDebut() {
         return boxHeureDebut;
     }
 
-    public JComboBox getBoxHeureFin() {
+    public JComboBox<String> getBoxHeureFin() {
         return boxHeureFin;
     }
 
-    public JComboBox getReservationBox() {
+    public JComboBox<String> getReservationBox() {
         return reservationBox;
+    }
+
+    public JButton getDeleteReservation() {
+        return deleteReservation;
     }
 }

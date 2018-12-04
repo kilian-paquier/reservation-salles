@@ -51,4 +51,13 @@ public class Utilisateur {
     public void setReservations(List<Reservation> reservations) {
         this.reservations = reservations;
     }
+
+    public Salle getSalle(String nomSalle) {
+        for (Reservation reservation : reservations) {
+            if (reservation.getSalle().getNomSalle().equals("nomSalle")) {
+                return reservation.getSalle();
+            }
+        }
+        return null;
+    }
 }
