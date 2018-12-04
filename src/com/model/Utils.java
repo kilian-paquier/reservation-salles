@@ -1,8 +1,12 @@
 package com.model;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class Utils {
+public abstract class Utils {
 
     // JDBC driver name and database URL
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
@@ -52,10 +56,11 @@ public class Utils {
 
             //Creation USER
             String sql2 = "CREATE TABLE USER " +
-                    "(Id_user INTEGER not NULL, " +
+                    " (Mail_user VARCHAR(255) not NULL, " +
                     " Nom_user VARCHAR(255), " +
                     " Prenom_user VARCHAR(255)," +
-                    " PRIMARY KEY ( Id_user ))";
+                    " Password VARCHAR(255)," +
+                    " PRIMARY KEY ( Mail_user ))";
 
             stmt.executeUpdate(sql2);
             System.out.println("Created table in given database...");
@@ -77,6 +82,66 @@ public class Utils {
             }//end finally try
         }//end try
         System.out.println("Goodbye!");
+    }
+
+    /**
+     * registers a new user in the database
+     * @param nom the name of the user
+     * @param prenom the firstname of the user
+     */
+    public static void registerUser(String nom, String prenom, String mail, String password) {
+        Connection connection;
+        Statement statement;
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            connection = DriverManager.getConnection(DB_URL, USER, "");
+            statement = connection.createStatement();
+
+            String sql = "INSERT INTO USER(Mail_user, Nom_user, Prenom_user, mail, Password) VALUES('"+ mail +"','"+ nom +"','"+ prenom +"','"+ password +"')";
+            statement.executeUpdate(sql);
+
+            statement.close();
+            connection.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static ResultSet checkReservationSalles(int id_salle) {
+        Connection connection;
+        Statement statement;
+
+        try {
+            Class.forName(JDBC_DRIVER);
+            connection = DriverManager.getConnection(DB_URL, USER, "");
+            statement = connection.createStatement();
+
+            String sql = "SELECT Date_debut, Date_fin FROM RESERVATION WHERE Id_salle = " + id_salle;
+            return statement.executeQuery(sql);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
+    public static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(password.getBytes());
+            byte[] bytes = md.digest();
+            StringBuilder sb = new StringBuilder();
+            for(int i=0; i< bytes.length ;i++)
+            {
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }
