@@ -1,6 +1,7 @@
 package com.controler;
 
 import com.model.Reservation;
+import com.model.Salle;
 import com.model.Utilisateur;
 import com.model.Utils;
 import com.view.Connexion;
@@ -17,6 +18,7 @@ import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 public class Controler {
     private MainView mainView;
@@ -122,7 +124,11 @@ public class Controler {
     private void initListSalles() {
         DefaultListModel<String> defaultListModel = new DefaultListModel<>();
 
-        // Faire liste
+        List<Salle> salles = Utils.getSalles();
+
+        for (Salle salle : salles) {
+            defaultListModel.addElement(salle.getNomSalle());
+        }
 
         mainView.getListSalle().setModel(defaultListModel);
     }

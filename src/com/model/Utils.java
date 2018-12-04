@@ -14,11 +14,6 @@ import java.util.Properties;
 public abstract class Utils {
     private static Connection connection;
 
-    private static String DB_URL;
-
-    private static String USER;
-    private static String PASS;
-
     /**
      * registers a new user in the database
      *
@@ -26,7 +21,6 @@ public abstract class Utils {
      * @param prenom the firstname of the user
      */
     public static void registerUser(String nom, String prenom, String mail, String password) throws SQLException {
-        connection = DriverManager.getConnection(DB_URL, USER, PASS);
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO user(mail_user, nom_user, prenom_user, password) value (?,?,?,?)");
         preparedStatement.setString(1, mail);
         preparedStatement.setString(2, nom);
@@ -36,8 +30,39 @@ public abstract class Utils {
         preparedStatement.executeUpdate();
 
         preparedStatement.close();
-        connection.close();
+    }
 
+    public static Salle getSalle(int id_salle) {
+        Salle salle = null;
+
+        try {
+            PreparedStatement statement = connection.prepareStatement("select * from salle where id_salle = ?");
+            statement.setInt(1, id_salle);
+
+            ResultSet set = statement.executeQuery();
+
+            while (set.next())
+                salle = new Salle(set.getInt(1), set.getString(2));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return salle;
+    }
+
+    public static List<Salle> getSalles() {
+        List<Salle> salles = new ArrayList<>();
+
+        try {
+            PreparedStatement statement = connection.prepareStatement("select * from salle");
+            ResultSet set = statement.executeQuery();
+            while (set.next())
+                salles.add(new Salle(set.getInt(1), set.getString(2)));
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return salles;
     }
 
     public static Utilisateur connectUser(String mail, String password) {
@@ -57,12 +82,7 @@ public abstract class Utils {
 
                 set = preparedStatement.executeQuery();
                 while (set.next()) {
-                    PreparedStatement preparedStatement1 = connection.prepareStatement("select * from salle where id_salle = ?");
-                    preparedStatement.setInt(1, set.getInt(1));
-                    ResultSet set1 = preparedStatement1.executeQuery();
-                    Salle salle = null;
-                    while (set1.next())
-                        salle = new Salle(set1.getInt(1), set1.getString(2));
+                    Salle salle = getSalle(set.getInt(1));
                     user.addReservation(new Reservation(user, salle, set.getDate(3), set.getDate(4)));
                 }
             }
@@ -102,7 +122,6 @@ public abstract class Utils {
             preparedStatement.setDate(4, reservation.getDateFin());
 
             preparedStatement.executeUpdate();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -155,9 +174,9 @@ public abstract class Utils {
 
             /*String JDBC_DRIVER = properties.get("driver").toString();
             Class.forName(JDBC_DRIVER);*/
-            DB_URL = properties.get("bdd_url").toString();
-            PASS = properties.get("password").toString();
-            USER = properties.get("user").toString();
+            String DB_URL = properties.get("bdd_url").toString();
+            String PASS = properties.get("password").toString();
+            String USER = properties.get("user").toString();
 
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
         } catch (IOException | SQLException e) {
