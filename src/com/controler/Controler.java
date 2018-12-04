@@ -1,10 +1,10 @@
 package com.controler;
 
 import com.model.Reservation;
-import com.model.Salle;
 import com.model.Utilisateur;
 import com.model.Utils;
 import com.view.Connexion;
+import com.view.ForgotPassword;
 import com.view.MainView;
 import com.view.SignUp;
 
@@ -12,6 +12,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -19,13 +21,14 @@ import java.util.Arrays;
 public class Controler {
     private MainView mainView;
     private Utilisateur utilisateur;
+    private Connexion connexion;
 
-    public Controler(String title) {
+    public Controler() {
         opening();
     }
 
     private void opening() {
-        Connexion connexion = new Connexion();
+        connexion = new Connexion();
         connexion.getMdpForgot().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -49,7 +52,10 @@ public class Controler {
 
             mainView = new MainView();
             init();
+            mainView.open();
         });
+
+        connexion.open();
     }
 
     private void init() {
@@ -62,6 +68,7 @@ public class Controler {
     }
 
     private void actionForgot() {
+        ForgotPassword forgotPassword = new ForgotPassword();
 
     }
 
@@ -80,10 +87,19 @@ public class Controler {
                 signUp.dispose();
                 mainView = new MainView();
                 init();
+                mainView.open();
             } catch (SQLException | ClassNotFoundException e1) {
-                e1.printStackTrace();
+                JOptionPane.showMessageDialog(null, e1.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
+
+        signUp.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                connexion.setVisible(true);
+            }
+        });
+        signUp.open();
     }
 
     private void initListSalles() {
@@ -118,11 +134,11 @@ public class Controler {
 
     private void deleteReservation() {
         String[] reservation = String.valueOf(mainView.getReservationBox().getSelectedItem()).split("le");
-        String nomSalle = reservation[0];
-        nomSalle = nomSalle.trim();
-        String dateDebut = reservation[1];
+        String nomSalle = reservation[0].trim();
+        String dateDebut = reservation[1].trim();
+        LocalDateTime debut = LocalDateTime.parse(dateDebut);
 
-
+        utilisateur.deleteReservation(nomSalle, debut);
     }
 
     private void initReservations() {

@@ -13,10 +13,16 @@ public class Connexion extends JFrame {
     public Connexion() {
         setContentPane(globalPanel);
         setTitle("Connexion");
+        mdpForgot.setText("<html><u>" + mdpForgot.getText() + "</u></html>");
+        signUp.setText("<html><u>" + signUp.getText() + "</u></html>");
     }
 
     public void open() {
-
+        pack();
+        setSize(400,400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     public JTextField getMailField() {
