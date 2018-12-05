@@ -11,16 +11,12 @@ import com.view.SignUp;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
+import java.sql.Date;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
-import java.util.List;
 
 public class Controler {
     private MainView mainView;
@@ -50,28 +46,40 @@ public class Controler {
             }
         });
 
-        connexion.getSeConnecterButton().addActionListener(e -> {
-            String mail = connexion.getMailField().getText();
-            String mdp = Utils.hashPassword(Arrays.toString(connexion.getMdpField().getPassword()));
-
-            utilisateur = Utils.connectUser(mail, mdp);
-            if (utilisateur == null)
-                JOptionPane.showMessageDialog(null, "Mot de passe ou mail invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
-            else {
-                mainView = new MainView();
-                init();
-                mainView.open();
-                connexion.dispose();
+        connexion.getMdpField().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                    logIn();
             }
         });
 
+        connexion.getSeConnecterButton().addActionListener(e -> logIn());
+
         connexion.open();
+    }
+
+    private void logIn() {
+        String mail = connexion.getMailField().getText();
+        String mdp = Utils.hashPassword(Arrays.toString(connexion.getMdpField().getPassword()));
+
+        utilisateur = Utils.connectUser(mail, mdp);
+        if (utilisateur == null)
+            JOptionPane.showMessageDialog(null, "Mot de passe ou mail invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+        else {
+            mainView = new MainView();
+            init();
+            mainView.open();
+            connexion.dispose();
+        }
     }
 
     private void init() {
         initListReservations();
         initListSalles();
         initReservations();
+        initBoxReservations();
+        initBoxSalles();
 
         mainView.getDeleteReservation().addActionListener(e -> deleteReservation());
         mainView.getAddReservation().addActionListener(e -> addReservation());
@@ -83,34 +91,36 @@ public class Controler {
             String mail = forgotPassword.getMailField().getText();
             System.out.println(Utils.getPassword(mail));
         });
+
         forgotPassword.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 connexion.setVisible(true);
             }
         });
+
+        forgotPassword.getMailField().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    String mail = forgotPassword.getMailField().getText();
+                    System.out.println(Utils.getPassword(mail));
+                }
+            }
+        });
+
         forgotPassword.open();
     }
 
     private void actionSignUp() {
         SignUp signUp = new SignUp();
-        signUp.getSignupButton().addActionListener(e -> {
-            String prenom = signUp.getPrenomField().getText();
-            String nom = signUp.getNomField().getText();
-            String mail = signUp.getMailField().getText();
-            char[] mdp = signUp.getMdpField().getPassword();
-            String motDePasse = Utils.hashPassword(Arrays.toString(mdp));
+        signUp.getSignupButton().addActionListener(e -> register(signUp));
 
-            utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
-            try {
-                Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
-
-                signUp.dispose();
-                mainView = new MainView();
-                init();
-                mainView.open();
-            } catch (SQLException e1) {
-                JOptionPane.showMessageDialog(null, "L'email est déjà utilisé par un autre utilisateur", "Erreur", JOptionPane.ERROR_MESSAGE);
+        signUp.getMdpField().addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                    register(signUp);
             }
         });
 
@@ -121,6 +131,25 @@ public class Controler {
             }
         });
         signUp.open();
+    }
+
+    private void register(SignUp signUp) {
+        String prenom = signUp.getPrenomField().getText();
+        String nom = signUp.getNomField().getText();
+        String mail = signUp.getMailField().getText();
+        String motDePasse = Utils.hashPassword(Arrays.toString(signUp.getMdpField().getPassword()));
+
+        utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
+        try {
+            Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
+
+            signUp.dispose();
+            mainView = new MainView();
+            init();
+            mainView.open();
+        } catch (SQLException e1) {
+            JOptionPane.showMessageDialog(null, "L'email est déjà utilisé par un autre utilisateur", "Erreur", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void initListSalles() {
@@ -166,11 +195,23 @@ public class Controler {
 
     }
 
+    private void initBoxSalles() {
+        for (Salle salle : Utils.getSalles()) {
+            mainView.getBoxSalle().addItem(salle.getNomSalle());
+        }
+    }
+
+    private void initBoxReservations() {
+        for (Reservation reservation : utilisateur.getReservations()) {
+            mainView.getReservationBox().addItem(reservation.toString());
+        }
+    }
+
     private void deleteReservation() {
         String[] reservation = String.valueOf(mainView.getReservationBox().getSelectedItem()).split("le");
         String nomSalle = reservation[0].trim();
         String dateDebut = reservation[1].trim();
-        LocalDateTime debut = LocalDateTime.parse(dateDebut);
+        Date debut = Date.valueOf(dateDebut);
 
         utilisateur.deleteReservation(nomSalle, debut);
     }

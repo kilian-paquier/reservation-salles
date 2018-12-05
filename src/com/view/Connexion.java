@@ -19,7 +19,7 @@ public class Connexion extends JFrame {
 
     public void open() {
         pack();
-        setSize(400,300);
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setVisible(true);

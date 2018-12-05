@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,7 +38,6 @@ public abstract class Utils {
     }
 
 
-
     public static Salle getSalle(int id_salle) {
         Salle salle = null;
         try {
@@ -51,8 +48,23 @@ public abstract class Utils {
 
             while (set.next())
                 salle = new Salle(set.getInt(1), set.getString(2));
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        catch (Exception e) {
+        return salle;
+    }
+
+    public static Salle getSalle(String nom_salle) {
+        Salle salle = null;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("select * from salle where nom_salle = ?");
+            preparedStatement.setString(1, nom_salle);
+
+            ResultSet set = preparedStatement.executeQuery();
+
+            while (set.next())
+                salle = new Salle(set.getInt(1), set.getString(2));
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return salle;

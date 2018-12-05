@@ -1,5 +1,6 @@
 package com.model;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,14 +72,14 @@ public class Utilisateur {
 
     public void addReservation(Reservation reservation) {
         reservations.add(reservation);
-        // Push dans la BDD
+        Utils.reserveSalle(reservation);
     }
 
-    public void deleteReservation(String nomSalle, LocalDateTime debut) {
+    public void deleteReservation(String nomSalle, Date debut) {
         for (Reservation reservation : reservations) {
             if (reservation.getSalle().getNomSalle().equals(nomSalle) && reservation.getDateDebut().equals(debut)) {
                 reservations.remove(reservation);
-                // Appel BDD
+                Utils.annulerReservationSalle(reservation);
                 break;
             }
         }

@@ -14,7 +14,9 @@ create table salle
 (
   id_salle  int auto_increment
     primary key,
-  nom_salle varchar(255) null
+  nom_salle varchar(255) not null,
+  constraint salle_nom_salle_uindex
+    unique (nom_salle)
 );
 
 create table user
