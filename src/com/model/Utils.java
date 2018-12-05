@@ -39,9 +39,10 @@ public abstract class Utils {
         preparedStatement.close();
     }
 
+
+
     public static Salle getSalle(int id_salle) {
         Salle salle = null;
-}
         try {
             PreparedStatement statement = connection.prepareStatement("select * from salle where id_salle = ?");
             statement.setInt(1, id_salle);
@@ -65,11 +66,11 @@ public abstract class Utils {
             ResultSet set = statement.executeQuery();
             while (set.next())
                 salles.add(new Salle(set.getInt(1), set.getString(2)));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return salles;
+    }
 
     public static Utilisateur connectUser(String mail, String password) {
         Utilisateur user = null;
