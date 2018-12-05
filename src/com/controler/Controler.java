@@ -19,6 +19,8 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Vector;
+import java.util.List;
 
 public class Controler {
     private MainView mainView;
@@ -146,7 +148,16 @@ public class Controler {
         defaultTableModel.addColumn("Début");
         defaultTableModel.addColumn("Fin");
 
-        // Faire liste
+        List<Reservation> reservations = Utils.checkAllReservations();
+
+        for (Reservation reservation : reservations) {
+            Vector<String> data = new Vector<>();
+            data.add(reservation.getUtilisateur().getPrenom() + " " + reservation.getUtilisateur().getNom());
+            data.add(reservation.getSalle().getNomSalle());
+            data.add(reservation.getDateDebut().toString());
+            data.add(reservation.getDateFin().toString());
+            defaultTableModel.addRow(data);
+        }
 
         mainView.getTableReservations().setModel(defaultTableModel);
     }

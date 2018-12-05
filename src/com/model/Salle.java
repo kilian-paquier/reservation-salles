@@ -9,6 +9,10 @@ public class Salle {
         this.nomSalle = nomSalle;
     }
 
+    public Salle(String nomSalle) {
+        this.nomSalle = nomSalle;
+    }
+
     public int getId() {
         return id;
     }

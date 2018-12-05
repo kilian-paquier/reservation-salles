@@ -8,11 +8,17 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
 public abstract class Utils {
     private static Connection connection;
+
+    private static String DB_URL;
+
+    private static String USER;
+    private static String PASS;
 
     /**
      * registers a new user in the database
@@ -21,6 +27,7 @@ public abstract class Utils {
      * @param prenom the firstname of the user
      */
     public static void registerUser(String nom, String prenom, String mail, String password) throws SQLException {
+        connection = DriverManager.getConnection(DB_URL, USER, PASS);
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO user(mail_user, nom_user, prenom_user, password) value (?,?,?,?)");
         preparedStatement.setString(1, mail);
         preparedStatement.setString(2, nom);
@@ -34,7 +41,7 @@ public abstract class Utils {
 
     public static Salle getSalle(int id_salle) {
         Salle salle = null;
-
+}
         try {
             PreparedStatement statement = connection.prepareStatement("select * from salle where id_salle = ?");
             statement.setInt(1, id_salle);
@@ -63,7 +70,6 @@ public abstract class Utils {
             e.printStackTrace();
         }
         return salles;
-    }
 
     public static Utilisateur connectUser(String mail, String password) {
         Utilisateur user = null;
@@ -92,8 +98,27 @@ public abstract class Utils {
         return user;
     }
 
-    public static List<LocalDateTime> checkDispoDebutSalle(int id_salle, LocalDate date) {
-        List<LocalDateTime> dates_dispos = new ArrayList<>();
+    public static List<Reservation> checkAllReservations() {
+        List<Reservation> reservations = new ArrayList<>();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT nom_user, prenom_user, nom_salle, date_debut, date_fin FROM " +
+                            "(user INNER JOIN reservation ON user.mail_user = reservation.mail_user) INNER JOIN salle" +
+                            " ON salle.id_salle = reservation.id_salle");
+            ResultSet set = preparedStatement.executeQuery();
+
+            while (set.next())
+                reservations.add(new Reservation(new Utilisateur(set.getString(1), set.getString(0)), new Salle(set.getString(2)),
+                        set.getDate(3), set.getDate(4)));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return reservations;
+    }
+
+    public static List<Date> checkDispoDebutSalle(int id_salle, Date date) {
+        List<Date> dates_dispos = new ArrayList<>();
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT date_debut, date_fin from reservation where id_salle = ? " +
@@ -122,6 +147,7 @@ public abstract class Utils {
             preparedStatement.setDate(4, reservation.getDateFin());
 
             preparedStatement.executeUpdate();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -174,9 +200,9 @@ public abstract class Utils {
 
             /*String JDBC_DRIVER = properties.get("driver").toString();
             Class.forName(JDBC_DRIVER);*/
-            String DB_URL = properties.get("bdd_url").toString();
-            String PASS = properties.get("password").toString();
-            String USER = properties.get("user").toString();
+            DB_URL = properties.get("bdd_url").toString();
+            PASS = properties.get("password").toString();
+            USER = properties.get("user").toString();
 
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
         } catch (IOException | SQLException e) {

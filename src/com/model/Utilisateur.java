@@ -19,6 +19,11 @@ public class Utilisateur {
         reservations = new ArrayList<>();
     }
 
+    public Utilisateur(String prenom, String nom) {
+        this.prenom = prenom;
+        this.nom = nom;
+    }
+
     public String getPrenom() {
         return prenom;
     }
