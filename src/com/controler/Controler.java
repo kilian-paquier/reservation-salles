@@ -1,5 +1,6 @@
 package com.controler;
 
+import com.Notification;
 import com.model.Reservation;
 import com.model.Salle;
 import com.model.Utilisateur;
@@ -221,21 +222,38 @@ public class Controler {
             mainView.getBoxJourFin().addItem(Date.valueOf(date.toString()).toString());
         }
 
-        for (int i = 0; i < 23; i++) {
-            LocalTime time = LocalTime.of(0,0).plusHours(i);
+        LocalTime time = LocalTime.of(7,0);
+        while ((time = time.plusHours(1)).getHour() <= 22) {
             mainView.getBoxHeureDebut().addItem(time.toString());
+            if (time.getHour() < 22)
+                mainView.getBoxHeureFin().addItem(time.plusHours(1).toString());
         }
 
-        // todo à corriger et prendre en compte la date
-        mainView.getBoxHeureDebut().addItemListener(e -> {
-            LocalTime time = LocalTime.parse((CharSequence) Objects.requireNonNull(mainView.getBoxHeureDebut().getSelectedItem()));
-            int i = 0;
-            while (i <= 18) {
-                time = time.plusHours(1);
-                mainView.getBoxHeureFin().addItem(time.toString());
-                i++;
+        mainView.getBoxHeureDebut().addItemListener(e -> changeHours());
+
+        mainView.getBoxJourDebut().addItemListener(e -> changeHours());
+
+        mainView.getBoxJourFin().addItemListener(e -> changeHours());
+    }
+
+    private void changeHours() {
+        if (Date.valueOf(String.valueOf(mainView.getBoxJourDebut().getSelectedItem())).after(Date.valueOf(String.valueOf(mainView.getBoxJourFin().getSelectedItem())))) {
+            mainView.getBoxJourDebut().setSelectedItem(mainView.getBoxJourFin().getSelectedItem());
+            new Notification(mainView, "Erreur", "L'heure de début de réservation ne peut pas être après l'heure de fin de réservation");
+        }
+        mainView.getBoxHeureFin().removeAllItems();
+        if (String.valueOf(mainView.getBoxJourDebut().getSelectedItem()).equals(String.valueOf(mainView.getBoxJourFin().getSelectedItem()))) {
+            LocalTime inTime = LocalTime.parse((CharSequence) Objects.requireNonNull(mainView.getBoxHeureDebut().getSelectedItem()));
+            while ((inTime = inTime.plusHours(1)).getHour() <= 22) {
+                mainView.getBoxHeureFin().addItem(inTime.toString());
             }
-        });
+        }
+        else {
+            LocalTime inTime = LocalTime.of(7,0);
+            while ((inTime = inTime.plusHours(1)).getHour() <= 22) {
+                mainView.getBoxHeureFin().addItem(inTime.toString());
+            }
+        }
     }
 
     private void initBoxSalles() {
