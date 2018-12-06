@@ -12,11 +12,8 @@ import java.util.Properties;
 
 public abstract class Utils {
     private static Connection connection;
-
-    private static String DB_URL;
-
-    private static String USER;
-    private static String PASS;
+    private static Properties properties;
+    private static String lastMail;
 
     /**
      * registers a new user in the database
@@ -25,7 +22,6 @@ public abstract class Utils {
      * @param prenom the firstname of the user
      */
     public static void registerUser(String nom, String prenom, String mail, String password) throws SQLException {
-        connection = DriverManager.getConnection(DB_URL, USER, PASS);
         PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO user(mail_user, nom_user, prenom_user, password) value (?,?,?,?)");
         preparedStatement.setString(1, mail);
         preparedStatement.setString(2, nom);
@@ -208,14 +204,15 @@ public abstract class Utils {
 
     public static void connection() {
         try {
-            Properties properties = new Properties();
+            properties = new Properties();
             properties.loadFromXML(new FileInputStream("properties.xml"));
 
             /*String JDBC_DRIVER = properties.get("driver").toString();
             Class.forName(JDBC_DRIVER);*/
-            DB_URL = properties.get("bdd_url").toString();
-            PASS = properties.get("password").toString();
-            USER = properties.get("user").toString();
+            String DB_URL = properties.get("bdd_url").toString();
+            String PASS = properties.get("password").toString();
+            String USER = properties.get("user").toString();
+            lastMail = properties.get("lastMail").toString();
 
             connection = DriverManager.getConnection(DB_URL, USER, PASS);
         } catch (IOException | SQLException e) {
@@ -238,5 +235,17 @@ public abstract class Utils {
             e.printStackTrace();
         }
         return password;
+    }
+
+    public static String getLastMail() {
+        return lastMail;
+    }
+
+    public static Connection getConnection() {
+        return connection;
+    }
+
+    public static Properties getProperties() {
+        return properties;
     }
 }

@@ -12,11 +12,15 @@ import com.view.SignUp;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 
 public class Controler {
@@ -31,6 +35,7 @@ public class Controler {
 
     private void opening() {
         connexion = new Connexion();
+        connexion.getMailField().setText(Utils.getLastMail());
         connexion.getMdpForgot().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -68,9 +73,13 @@ public class Controler {
         if (utilisateur == null)
             JOptionPane.showMessageDialog(null, "Mot de passe ou mail invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
         else {
-            mainView = new MainView();
-            init();
-            mainView.open();
+            try {
+                Utils.getProperties().setProperty("lastMail", mail);
+                Utils.getProperties().storeToXML(new FileOutputStream("properties.xml"), "Sauvegarde");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            connexion();
             connexion.dispose();
         }
     }
@@ -117,7 +126,6 @@ public class Controler {
     private void actionSignUp() {
         SignUp signUp = new SignUp();
         signUp.getSignupButton().addActionListener(e -> register(signUp));
-
         signUp.getMdpField().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -144,14 +152,23 @@ public class Controler {
         utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
         try {
             Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
-
+            try {
+                Utils.getProperties().setProperty("lastMail", mail);
+                Utils.getProperties().storeToXML(new FileOutputStream("properties.xml"), "Sauvegarde");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             signUp.dispose();
-            mainView = new MainView();
-            init();
-            mainView.open();
+            connexion();
         } catch (SQLException e1) {
             JOptionPane.showMessageDialog(null, "L'email est déjà utilisé par un autre utilisateur", "Erreur", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void connexion() {
+        mainView = new MainView();
+        init();
+        mainView.open();
     }
 
     private void initListSalles() {
@@ -201,9 +218,24 @@ public class Controler {
         for (int i = 0; i < 30; i++) {
             LocalDate date = LocalDate.now().plusDays(i);
             mainView.getBoxJourDebut().addItem(Date.valueOf(date.toString()).toString());
+            mainView.getBoxJourFin().addItem(Date.valueOf(date.toString()).toString());
         }
 
+        for (int i = 0; i < 23; i++) {
+            LocalTime time = LocalTime.of(0,0).plusHours(i);
+            mainView.getBoxHeureDebut().addItem(time.toString());
+        }
 
+        // todo à corriger et prendre en compte la date
+        mainView.getBoxHeureDebut().addItemListener(e -> {
+            LocalTime time = LocalTime.parse((CharSequence) Objects.requireNonNull(mainView.getBoxHeureDebut().getSelectedItem()));
+            int i = 0;
+            while (i <= 18) {
+                time = time.plusHours(1);
+                mainView.getBoxHeureFin().addItem(time.toString());
+                i++;
+            }
+        });
     }
 
     private void initBoxSalles() {
