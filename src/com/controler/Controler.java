@@ -12,6 +12,7 @@ import com.view.SignUp;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -72,7 +73,7 @@ public class Controler {
 
         utilisateur = Utils.connectUser(mail, mdp);
         if (utilisateur == null)
-            JOptionPane.showMessageDialog(null, "Mot de passe ou mail invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+            new Notification(connexion, "Erreur", "Mot de passe ou mail invalide");
         else {
             try {
                 Utils.getProperties().setProperty("lastMail", mail);
@@ -149,20 +150,41 @@ public class Controler {
         String nom = signUp.getNomField().getText();
         String mail = signUp.getMailField().getText();
         String motDePasse = Utils.hashPassword(Arrays.toString(signUp.getMdpField().getPassword()));
-
         utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
         try {
-            Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
-            try {
-                Utils.getProperties().setProperty("lastMail", mail);
-                Utils.getProperties().storeToXML(new FileOutputStream("properties.xml"), "Sauvegarde");
-            } catch (IOException e) {
-                e.printStackTrace();
+            assert motDePasse != null;
+            if (!prenom.equals("") && !nom.equals("") && !mail.equals("") && !motDePasse.equals("4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945")) {
+                Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
+                try {
+                    Utils.getProperties().setProperty("lastMail", mail);
+                    Utils.getProperties().storeToXML(new FileOutputStream("properties.xml"), "Sauvegarde");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                signUp.dispose();
+                connexion();
             }
-            signUp.dispose();
-            connexion();
+            else {
+                new Notification(signUp, "Erreur", "Les champs ne peuvent pas être vide");
+                if (prenom.equals(""))
+                    signUp.getPrenomField().setBorder(BorderFactory.createLineBorder(Color.red));
+                else
+                    signUp.getPrenomField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                if (nom.equals(""))
+                    signUp.getNomField().setBorder(BorderFactory.createLineBorder(Color.red));
+                else
+                    signUp.getNomField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                if (mail.equals(""))
+                    signUp.getMailField().setBorder(BorderFactory.createLineBorder(Color.red));
+                else
+                    signUp.getMailField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                if (motDePasse.equals("4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"))
+                    signUp.getMdpField().setBorder(BorderFactory.createLineBorder(Color.red));
+                else
+                    signUp.getMdpField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
+            }
         } catch (SQLException e1) {
-            JOptionPane.showMessageDialog(null, "L'email est déjà utilisé par un autre utilisateur", "Erreur", JOptionPane.ERROR_MESSAGE);
+            new Notification(signUp, "Erreur", "L'email est déjà utilisé par un autre utilisateur");
         }
     }
 
@@ -222,7 +244,7 @@ public class Controler {
             mainView.getBoxJourFin().addItem(Date.valueOf(date.toString()).toString());
         }
 
-        LocalTime time = LocalTime.of(7,0);
+        LocalTime time = LocalTime.of(7, 0);
         while ((time = time.plusHours(1)).getHour() <= 22) {
             mainView.getBoxHeureDebut().addItem(time.toString());
             if (time.getHour() < 22)
@@ -247,9 +269,8 @@ public class Controler {
             while ((inTime = inTime.plusHours(1)).getHour() <= 22) {
                 mainView.getBoxHeureFin().addItem(inTime.toString());
             }
-        }
-        else {
-            LocalTime inTime = LocalTime.of(7,0);
+        } else {
+            LocalTime inTime = LocalTime.of(7, 0);
             while ((inTime = inTime.plusHours(1)).getHour() <= 22) {
                 mainView.getBoxHeureFin().addItem(inTime.toString());
             }
