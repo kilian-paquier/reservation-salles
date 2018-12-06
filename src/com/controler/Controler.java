@@ -14,6 +14,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.event.*;
 import java.sql.Date;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
@@ -80,6 +81,7 @@ public class Controler {
         initReservations();
         initBoxReservations();
         initBoxSalles();
+        initDaysHours();
 
         mainView.getDeleteReservation().addActionListener(e -> deleteReservation());
         mainView.getAddReservation().addActionListener(e -> addReservation());
@@ -192,6 +194,15 @@ public class Controler {
     }
 
     private void addReservation() {
+
+    }
+
+    private void initDaysHours() {
+        for (int i = 0; i < 30; i++) {
+            LocalDate date = LocalDate.now().plusDays(i);
+            mainView.getBoxJourDebut().addItem(Date.valueOf(date.toString()).toString());
+        }
+
 
     }
 
