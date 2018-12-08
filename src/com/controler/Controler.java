@@ -57,8 +57,9 @@ public class Controler {
         connexion.getMdpField().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     logIn();
+                }
             }
         });
 
@@ -131,8 +132,9 @@ public class Controler {
         signUp.getMdpField().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     register(signUp);
+                }
             }
         });
 
@@ -163,8 +165,7 @@ public class Controler {
                 }
                 signUp.dispose();
                 connexion();
-            }
-            else {
+            } else {
                 new Notification(signUp, "Erreur", "Les champs ne peuvent pas être vide");
                 if (prenom.equals(""))
                     signUp.getPrenomField().setBorder(BorderFactory.createLineBorder(Color.red));
