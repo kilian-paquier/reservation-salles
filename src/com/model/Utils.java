@@ -192,14 +192,19 @@ public abstract class Utils {
      * @param reservation la réservation a effectuer
      */
     public static void reserveSalle(Reservation reservation) throws Exception {
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO reservation value(?,?,?,?,?,?)");
-        preparedStatement.setInt(1, reservation.getSalle().getId());
-        preparedStatement.setString(2, reservation.getUtilisateur().getMail());
-        preparedStatement.setDate(3, reservation.getDateDebut());
-        preparedStatement.setString(4, reservation.getHeureDebut().toString());
-        preparedStatement.setDate(5, reservation.getDateFin());
-        preparedStatement.setString(6, reservation.getHeureFin().toString());
-        preparedStatement.executeUpdate();
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO reservation value(?,?,?,?,?,?)");
+            preparedStatement.setInt(1, reservation.getSalle().getId());
+            preparedStatement.setString(2, reservation.getUtilisateur().getMail());
+            preparedStatement.setDate(3, reservation.getDateDebut());
+            preparedStatement.setString(4, reservation.getHeureDebut().toString());
+            preparedStatement.setDate(5, reservation.getDateFin());
+            preparedStatement.setString(6, reservation.getHeureFin().toString());
+            preparedStatement.executeUpdate();
+
+        } catch (Exception e) {
+            throw new Exception("Une salle a déjà été réservé sur cette plage horaire");
+        }
     }
 
     /**
