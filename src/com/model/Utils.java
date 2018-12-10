@@ -10,6 +10,8 @@ import java.sql.*;
 import java.time.temporal.TemporalUnit;
 import java.util.*;
 import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 public abstract class Utils {
     private static Connection connection;
@@ -56,7 +58,7 @@ public abstract class Utils {
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT nom_user, prenom_user, nom_salle, date_debut, date_fin FROM " +
+                    "SELECT nom_user, prenom_user, nom_salle, date_debut, heure_debut, date_fin, heure_fin FROM " +
                             "(utilisateur INNER JOIN reservation ON utilisateur.mail_user = reservation.mail_user) INNER JOIN salle" +
                             " ON salle.id_salle = reservation.id_salle where salle.nom_salle = ?");
             preparedStatement.setString(1, salle.getNomSalle());
@@ -212,10 +214,12 @@ public abstract class Utils {
      */
     public static void annulerReservationSalle(Reservation reservation) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM reservation WHERE id_salle = ? and date_debut = ? and date_fin = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM reservation WHERE id_salle = ? and date_debut = ? and date_fin = ? and heure_debut = ? and heure_fin = ?");
             preparedStatement.setInt(1, reservation.getSalle().getId());
             preparedStatement.setDate(2, reservation.getDateDebut());
             preparedStatement.setDate(3, reservation.getDateFin());
+            preparedStatement.setString(4, reservation.getHeureDebut().toString());
+            preparedStatement.setString(5, reservation.getHeureFin().toString());
 
             preparedStatement.executeUpdate();
         } catch (Exception e) {

@@ -102,7 +102,6 @@ public class Controler {
     private void init() {
         initListReservations(null);
         initListSalles();
-        initReservations();
         initBoxReservations();
         initBoxSalles();
         initDaysHours();
@@ -272,6 +271,7 @@ public class Controler {
         }
 
         mainView.getTableReservations().setModel(defaultTableModel);
+        mainView.getTableReservations().setAutoCreateRowSorter(true);
     }
 
     private void addReservation() {
@@ -352,25 +352,20 @@ public class Controler {
     private void initBoxReservations() {
         mainView.getReservationBox().removeAllItems();
         for (Reservation reservation : utilisateur.getReservations()) {
-            mainView.getReservationBox().addItem(reservation.toString());
+            mainView.getReservationBox().addItem(reservation);
         }
     }
 
     private void deleteReservation() {
-        String[] reservation = String.valueOf(mainView.getReservationBox().getSelectedItem()).split("le");
-        String nomSalle = reservation[0].trim();
-        String dateDebut = reservation[1].trim();
-        Date debut = Date.valueOf(dateDebut);
+        Reservation reservation = (Reservation) mainView.getReservationBox().getSelectedItem();
 
-        utilisateur.deleteReservation(nomSalle, debut);
-        initBoxReservations();
-        initListReservations(null);
-        new Notification(mainView, "Ok", "La réservation a bien été supprimée");
-    }
-
-    private void initReservations() {
-        for (Reservation reservation : utilisateur.getReservations()) {
-            mainView.getReservationBox().addItem(reservation.toString());
+        try {
+            utilisateur.deleteReservation(reservation);
+            initBoxReservations();
+            initListReservations(null);
+            new Notification(mainView, "Ok", "La réservation a bien été supprimée");
+        } catch (IOException e) {
+            new Notification(mainView, "Erreur", e.getMessage());
         }
     }
 }

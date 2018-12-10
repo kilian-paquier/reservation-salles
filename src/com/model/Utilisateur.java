@@ -1,5 +1,6 @@
 package com.model;
 
+import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,13 +75,10 @@ public class Utilisateur {
         reservations.add(reservation);
     }
 
-    public void deleteReservation(String nomSalle, Date debut) {
-        for (Reservation reservation : reservations) {
-            if (reservation.getSalle().getNomSalle().equals(nomSalle) && reservation.getDateDebut().equals(debut)) {
-                reservations.remove(reservation);
-                Utils.annulerReservationSalle(reservation);
-                break;
-            }
-        }
+    public void deleteReservation(Reservation reservation) throws IOException {
+        if (!reservations.remove(reservation))
+            throw new IOException("La réservation n'a pas été supprimée");
+        else
+            Utils.annulerReservationSalle(reservation);
     }
 }
