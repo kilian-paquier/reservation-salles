@@ -41,9 +41,11 @@ DROP TABLE IF EXISTS `reservation`;
 CREATE TABLE IF NOT EXISTS `reservation` (
   `id_salle` int(11) NOT NULL,
   `mail_user` varchar(255) NOT NULL,
-  `date_debut` datetime NOT NULL,
-  `date_fin` datetime NOT NULL,
-  PRIMARY KEY (`id_salle`,`date_debut`,`date_fin`),
+  `date_debut` date NOT NULL,
+  heure_debut varchar(255) not null,
+  `date_fin` date NOT NULL,
+  heure_fin varchar(255) not null,
+  PRIMARY KEY (`id_salle`,`date_debut`, heure_debut, date_fin, heure_fin),
   KEY `ForeignUser` (`mail_user`)
 );
 

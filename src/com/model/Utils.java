@@ -74,7 +74,7 @@ public abstract class Utils {
         ResultSet set = preparedStatement.executeQuery();
         while (set.next()) {
             reservations.add(new Reservation(new Utilisateur(set.getString(1), set.getString(0)), new Salle(set.getString(2)),
-                    set.getDate(3), set.getDate(4)));
+                    set.getDate(3), set.getString(4), set.getDate(5), set.getString(6)));
         }
     }
 
@@ -126,7 +126,7 @@ public abstract class Utils {
                 set = preparedStatement.executeQuery();
                 while (set.next()) {
                     Salle salle = getSalle(set.getInt(1));
-                    user.addReservation(new Reservation(user, salle, set.getDate(3), set.getDate(4)));
+                    user.addReservation(new Reservation(user, salle, set.getDate(3), set.getString(4), set.getDate(5), set.getString(6)));
                 }
             }
         } catch (Exception e) {
@@ -139,7 +139,7 @@ public abstract class Utils {
         List<Reservation> reservations = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT nom_user, prenom_user, nom_salle, date_debut, date_fin FROM " +
+                    "SELECT nom_user, prenom_user, nom_salle, date_debut, heure_debut, date_fin, heure_fin FROM " +
                             "(utilisateur INNER JOIN reservation ON utilisateur.mail_user = reservation.mail_user) INNER JOIN salle" +
                             " ON salle.id_salle = reservation.id_salle");
             addReservations(reservations, preparedStatement);
@@ -150,26 +150,19 @@ public abstract class Utils {
         return reservations;
     }
 
-    public void addReservation(Reservation reservation) {
-        try {
-            PreparedStatement preparedStatement1 = connection.prepareStatement("SELECT * FROM Reservation WHERE " +
-                    "(date_debut between ? and ?) or (date_fin between ? and ?)");
-            preparedStatement1.setDate(1, reservation.getDateDebut());
-            preparedStatement1.setDate(2, reservation.getDateFin());
-            preparedStatement1.setDate(3, reservation.getDateDebut());
-            preparedStatement1.setDate(4, reservation.getDateFin());
-            ResultSet set = preparedStatement1.executeQuery();
-            if (set.next())
-                throw new Exception("Une réservation existe déjà sur la plage horaire sélectionnée");
-            else {
-                PreparedStatement preparedStatement2 = connection.prepareStatement("INSERT INTO reservation VALUES(?,?,?,?)");
-                preparedStatement2.setInt(1, reservation.getSalle().getId());
-                preparedStatement2.setString(2, reservation.getUtilisateur().getMail());
-                preparedStatement2.setDate(3, reservation.getDateDebut());
-                preparedStatement2.setDate(4, reservation.getDateFin());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+    public static void addReservation(Reservation reservation) throws Exception {
+        // TODO A modifier
+        PreparedStatement preparedStatement1 = connection.prepareStatement("SELECT * FROM Reservation WHERE " +
+                "(date_debut between ? and ?) or (date_fin between ? and ?)");
+        preparedStatement1.setDate(1, reservation.getDateDebut());
+        preparedStatement1.setDate(2, reservation.getDateFin());
+        preparedStatement1.setDate(3, reservation.getDateDebut());
+        preparedStatement1.setDate(4, reservation.getDateFin());
+        ResultSet set = preparedStatement1.executeQuery();
+        if (set.next())
+            throw new Exception("Une réservation existe déjà sur la plage horaire sélectionnée");
+        else {
+            reserveSalle(reservation);
         }
     }
 

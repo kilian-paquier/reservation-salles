@@ -69,9 +69,9 @@ public class Utilisateur {
         return null;
     }
 
-    public void addReservation(Reservation reservation) {
+    public void addReservation(Reservation reservation) throws Exception {
+        Utils.addReservation(reservation);
         reservations.add(reservation);
-        Utils.reserveSalle(reservation);
     }
 
     public void deleteReservation(String nomSalle, Date debut) {

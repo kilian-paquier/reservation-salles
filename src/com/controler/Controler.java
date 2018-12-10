@@ -19,11 +19,10 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Vector;
 
 public class Controler {
     private MainView mainView;
@@ -276,7 +275,27 @@ public class Controler {
     }
 
     private void addReservation() {
+        Salle salle = Utils.getSalle(String.valueOf(mainView.getBoxSalle().getSelectedItem()));
+        String jourDebut = String.valueOf(mainView.getBoxJourDebut().getSelectedItem());
+        String heureDebut = String.valueOf(mainView.getBoxHeureDebut().getSelectedItem());
+        String jourFin = String.valueOf(mainView.getBoxJourFin().getSelectedItem());
+        String heurFin = String.valueOf(mainView.getBoxHeureFin().getSelectedItem());
 
+        String[] debutJour = jourDebut.split("-");
+        String[] finJour = jourFin.split("-");
+
+        LocalDate dateDebut = LocalDate.of(Integer.valueOf(debutJour[0]), Integer.valueOf(debutJour[1]), Integer.valueOf(debutJour[2]));
+        Date dateDeb = Date.valueOf(dateDebut);
+
+        LocalDate dateFin = LocalDate.of(Integer.valueOf(finJour[0]), Integer.valueOf(finJour[1]), Integer.valueOf(finJour[2]));
+        Date dateF = Date.valueOf(dateFin);
+
+        Reservation reservation = new Reservation(utilisateur, salle, dateDeb, heureDebut, dateF, heurFin);
+        try {
+            utilisateur.addReservation(reservation);
+        } catch (Exception e) {
+            new Notification(mainView, "Erreur", e.getMessage());
+        }
     }
 
     private void initDaysHours() {
