@@ -1,5 +1,7 @@
 package com.model;
 
+import com.mysql.cj.protocol.Resultset;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -128,6 +130,29 @@ public abstract class Utils {
             e.printStackTrace();
         }
         return reservations;
+    }
+
+    public void addReservation(Reservation reservation) {
+        try {
+            PreparedStatement preparedStatement1 = connection.prepareStatement("SELECT * FROM Reservation WHERE " +
+                    "(date_debut between ? and ?) or (date_fin between ? and ?)");
+            preparedStatement1.setDate(1, reservation.getDateDebut());
+            preparedStatement1.setDate(2, reservation.getDateFin());
+            preparedStatement1.setDate(3, reservation.getDateDebut());
+            preparedStatement1.setDate(4, reservation.getDateFin());
+            ResultSet set = preparedStatement1.executeQuery();
+            if (set.next())
+                throw new Exception("Une réservation existe déjà sur la plage horaire sélectionnée");
+            else {
+                PreparedStatement preparedStatement2 = connection.prepareStatement("INSERT INTO reservation VALUES(?,?,?,?)");
+                preparedStatement2.setInt(1, reservation.getSalle().getId());
+                preparedStatement2.setString(2, reservation.getUtilisateur().getMail());
+                preparedStatement2.setDate(3, reservation.getDateDebut());
+                preparedStatement2.setDate(4, reservation.getDateFin());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<Date> checkDispoDebutSalle(int id_salle, Date date) {
