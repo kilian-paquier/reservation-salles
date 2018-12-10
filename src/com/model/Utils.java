@@ -7,10 +7,8 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 
 public abstract class Utils {
     private static Connection connection;
@@ -151,7 +149,6 @@ public abstract class Utils {
     }
 
     public static void addReservation(Reservation reservation) throws Exception {
-        // TODO A modifier
         PreparedStatement preparedStatement1 = connection.prepareStatement("SELECT * FROM Reservation WHERE " +
                 "((date_debut between ? and ?) or (date_fin between ? and ?)) and ((heure_debut between ? and ?) or (heure_fin between ? and ?))");
         preparedStatement1.setDate(1, reservation.getDateDebut());
@@ -195,12 +192,11 @@ public abstract class Utils {
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO reservation value(?,?,?,?,?,?)");
             preparedStatement.setInt(1, reservation.getSalle().getId());
             preparedStatement.setString(2, reservation.getUtilisateur().getMail());
-            preparedStatement.setDate(3, reservation.getDateDebut());
+            preparedStatement.setDate(3, reservation.getDateDebut(), Calendar.getInstance());
             preparedStatement.setString(4, reservation.getHeureDebut().toString());
-            preparedStatement.setDate(5, reservation.getDateFin());
+            preparedStatement.setDate(5, reservation.getDateFin(), Calendar.getInstance());
             preparedStatement.setString(6, reservation.getHeureFin().toString());
             preparedStatement.executeUpdate();
-
         } catch (Exception e) {
             throw new Exception("Une salle a déjà été réservé sur cette plage horaire");
         }
