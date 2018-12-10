@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.time.temporal.TemporalUnit;
+import java.util.*;
 import java.util.*;
 import java.util.Date;
 
@@ -149,14 +151,15 @@ public abstract class Utils {
     }
 
     public static void addReservation(Reservation reservation) throws Exception {
+        // TODO A modifier
         PreparedStatement preparedStatement1 = connection.prepareStatement("SELECT * FROM Reservation WHERE " +
                 "((date_debut between ? and ?) or (date_fin between ? and ?)) and ((heure_debut between ? and ?) or (heure_fin between ? and ?))");
-        preparedStatement1.setDate(1, reservation.getDateDebut());
-        preparedStatement1.setDate(2, reservation.getDateFin());
-        preparedStatement1.setString(3, reservation.getHeureDebut().plusMinutes(1).toString());
-        preparedStatement1.setString(4, reservation.getHeureFin().minusMinutes(1).toString());
-        preparedStatement1.setDate(5, reservation.getDateDebut());
-        preparedStatement1.setDate(6, reservation.getDateFin());
+        preparedStatement1.setDate(1, reservation.getDateDebut(), Calendar.getInstance());
+        preparedStatement1.setDate(2, reservation.getDateFin(), Calendar.getInstance());
+        preparedStatement1.setDate(3, reservation.getDateDebut(), Calendar.getInstance());
+        preparedStatement1.setDate(4, reservation.getDateFin(), Calendar.getInstance());
+        preparedStatement1.setString(5, reservation.getHeureDebut().plusMinutes(1).toString());
+        preparedStatement1.setString(6, reservation.getHeureFin().minusMinutes(1).toString());
         preparedStatement1.setString(7, reservation.getHeureDebut().plusMinutes(1).toString());
         preparedStatement1.setString(8, reservation.getHeureFin().minusMinutes(1).toString());
         ResultSet set = preparedStatement1.executeQuery();
@@ -197,6 +200,7 @@ public abstract class Utils {
             preparedStatement.setDate(5, reservation.getDateFin(), Calendar.getInstance());
             preparedStatement.setString(6, reservation.getHeureFin().toString());
             preparedStatement.executeUpdate();
+
         } catch (Exception e) {
             throw new Exception("Une salle a déjà été réservé sur cette plage horaire");
         }
