@@ -1,5 +1,6 @@
 package com.controler;
 
+import com.Notification;
 import com.model.Reservation;
 import com.model.Salle;
 import com.model.Utilisateur;
@@ -11,12 +12,17 @@ import com.view.SignUp;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.*;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Vector;
 
 public class Controler {
@@ -31,6 +37,7 @@ public class Controler {
 
     private void opening() {
         connexion = new Connexion();
+        connexion.getMailField().setText(Utils.getLastMail());
         connexion.getMdpForgot().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -50,8 +57,9 @@ public class Controler {
         connexion.getMdpField().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     logIn();
+                }
             }
         });
 
@@ -66,11 +74,15 @@ public class Controler {
 
         utilisateur = Utils.connectUser(mail, mdp);
         if (utilisateur == null)
-            JOptionPane.showMessageDialog(null, "Mot de passe ou mail invalide", "Erreur", JOptionPane.ERROR_MESSAGE);
+            new Notification(connexion, "Erreur", "Mot de passe ou mail invalide");
         else {
-            mainView = new MainView();
-            init();
-            mainView.open();
+            try {
+                Utils.getProperties().setProperty("lastMail", mail);
+                Utils.getProperties().storeToXML(new FileOutputStream("properties.xml"), "Sauvegarde");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            connexion();
             connexion.dispose();
         }
     }
@@ -117,12 +129,12 @@ public class Controler {
     private void actionSignUp() {
         SignUp signUp = new SignUp();
         signUp.getSignupButton().addActionListener(e -> register(signUp));
-
         signUp.getMdpField().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER)
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     register(signUp);
+                }
             }
         });
 
@@ -140,18 +152,47 @@ public class Controler {
         String nom = signUp.getNomField().getText();
         String mail = signUp.getMailField().getText();
         String motDePasse = Utils.hashPassword(Arrays.toString(signUp.getMdpField().getPassword()));
-
         utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
         try {
-            Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
-
-            signUp.dispose();
-            mainView = new MainView();
-            init();
-            mainView.open();
+            assert motDePasse != null;
+            if (!prenom.equals("") && !nom.equals("") && !mail.equals("") && !motDePasse.equals("4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945")) {
+                Utils.registerUser(utilisateur.getNom(), utilisateur.getPrenom(), utilisateur.getMail(), utilisateur.getMotdepasse());
+                try {
+                    Utils.getProperties().setProperty("lastMail", mail);
+                    Utils.getProperties().storeToXML(new FileOutputStream("properties.xml"), "Sauvegarde");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                signUp.dispose();
+                connexion();
+            } else {
+                new Notification(signUp, "Erreur", "Les champs ne peuvent pas être vide");
+                if (prenom.equals(""))
+                    signUp.getPrenomField().setBorder(BorderFactory.createLineBorder(Color.red));
+                else
+                    signUp.getPrenomField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                if (nom.equals(""))
+                    signUp.getNomField().setBorder(BorderFactory.createLineBorder(Color.red));
+                else
+                    signUp.getNomField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                if (mail.equals(""))
+                    signUp.getMailField().setBorder(BorderFactory.createLineBorder(Color.red));
+                else
+                    signUp.getMailField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                if (motDePasse.equals("4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"))
+                    signUp.getMdpField().setBorder(BorderFactory.createLineBorder(Color.red));
+                else
+                    signUp.getMdpField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
+            }
         } catch (SQLException e1) {
-            JOptionPane.showMessageDialog(null, "L'email est déjà utilisé par un autre utilisateur", "Erreur", JOptionPane.ERROR_MESSAGE);
+            new Notification(signUp, "Erreur", "L'email est déjà utilisé par un autre utilisateur");
         }
+    }
+
+    private void connexion() {
+        mainView = new MainView();
+        init();
+        mainView.open();
     }
 
     private void initListSalles() {
@@ -201,9 +242,40 @@ public class Controler {
         for (int i = 0; i < 30; i++) {
             LocalDate date = LocalDate.now().plusDays(i);
             mainView.getBoxJourDebut().addItem(Date.valueOf(date.toString()).toString());
+            mainView.getBoxJourFin().addItem(Date.valueOf(date.toString()).toString());
         }
 
+        LocalTime time = LocalTime.of(7, 0);
+        while ((time = time.plusHours(1)).getHour() <= 22) {
+            mainView.getBoxHeureDebut().addItem(time.toString());
+            if (time.getHour() < 22)
+                mainView.getBoxHeureFin().addItem(time.plusHours(1).toString());
+        }
 
+        mainView.getBoxHeureDebut().addItemListener(e -> changeHours());
+
+        mainView.getBoxJourDebut().addItemListener(e -> changeHours());
+
+        mainView.getBoxJourFin().addItemListener(e -> changeHours());
+    }
+
+    private void changeHours() {
+        if (Date.valueOf(String.valueOf(mainView.getBoxJourDebut().getSelectedItem())).after(Date.valueOf(String.valueOf(mainView.getBoxJourFin().getSelectedItem())))) {
+            mainView.getBoxJourDebut().setSelectedItem(mainView.getBoxJourFin().getSelectedItem());
+            new Notification(mainView, "Erreur", "L'heure de début de réservation ne peut pas être après l'heure de fin de réservation");
+        }
+        mainView.getBoxHeureFin().removeAllItems();
+        if (String.valueOf(mainView.getBoxJourDebut().getSelectedItem()).equals(String.valueOf(mainView.getBoxJourFin().getSelectedItem()))) {
+            LocalTime inTime = LocalTime.parse((CharSequence) Objects.requireNonNull(mainView.getBoxHeureDebut().getSelectedItem()));
+            while ((inTime = inTime.plusHours(1)).getHour() <= 22) {
+                mainView.getBoxHeureFin().addItem(inTime.toString());
+            }
+        } else {
+            LocalTime inTime = LocalTime.of(7, 0);
+            while ((inTime = inTime.plusHours(1)).getHour() <= 22) {
+                mainView.getBoxHeureFin().addItem(inTime.toString());
+            }
+        }
     }
 
     private void initBoxSalles() {
