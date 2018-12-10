@@ -1,5 +1,7 @@
 package com.model;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
@@ -22,9 +24,7 @@ public abstract class Utils {
      * @param prenom the firstname of the user
      */
     public static void registerUser(String nom, String prenom, String mail, String password) throws SQLException {
-
-
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO user(mail_user, nom_user, prenom_user, password) value (?,?,?,?)");
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO utilisateur(mail_user, nom_user, prenom_user, password) value (?,?,?,?)");
         preparedStatement.setString(1, mail);
         preparedStatement.setString(2, nom);
         preparedStatement.setString(3, prenom);
@@ -50,6 +50,32 @@ public abstract class Utils {
             e.printStackTrace();
         }
         return salle;
+    }
+
+    public static List<Reservation> getReservations(Salle salle) {
+        List<Reservation> reservations = new ArrayList<>();
+
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    "SELECT nom_user, prenom_user, nom_salle, date_debut, date_fin FROM " +
+                            "(utilisateur INNER JOIN reservation ON utilisateur.mail_user = reservation.mail_user) INNER JOIN salle" +
+                            " ON salle.id_salle = reservation.id_salle where salle.nom_salle = ?");
+            preparedStatement.setString(1, salle.getNomSalle());
+
+            addReservations(reservations, preparedStatement);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return reservations;
+    }
+
+    private static void addReservations(List<Reservation> reservations, PreparedStatement preparedStatement) throws SQLException {
+        ResultSet set = preparedStatement.executeQuery();
+        while (set.next()) {
+            reservations.add(new Reservation(new Utilisateur(set.getString(1), set.getString(0)), new Salle(set.getString(2)),
+                    set.getDate(3), set.getDate(4)));
+        }
     }
 
     public static Salle getSalle(String nom_salle) {
@@ -85,7 +111,7 @@ public abstract class Utils {
     public static Utilisateur connectUser(String mail, String password) {
         Utilisateur user = null;
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM user WHERE mail_user = ? and password = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM utilisateur WHERE mail_user = ? and password = ?");
             preparedStatement.setString(1, mail);
             preparedStatement.setString(2, password);
             ResultSet set = preparedStatement.executeQuery();
@@ -109,18 +135,14 @@ public abstract class Utils {
         return user;
     }
 
-    public static List<Reservation> checkAllReservations() {
+    public static List<Reservation> getAllReservations() {
         List<Reservation> reservations = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
                     "SELECT nom_user, prenom_user, nom_salle, date_debut, date_fin FROM " +
-                            "(user INNER JOIN reservation ON user.mail_user = reservation.mail_user) INNER JOIN salle" +
+                            "(utilisateur INNER JOIN reservation ON utilisateur.mail_user = reservation.mail_user) INNER JOIN salle" +
                             " ON salle.id_salle = reservation.id_salle");
-            ResultSet set = preparedStatement.executeQuery();
-
-            while (set.next())
-                reservations.add(new Reservation(new Utilisateur(set.getString(1), set.getString(0)), new Salle(set.getString(2)),
-                        set.getDate(3), set.getDate(4)));
+            addReservations(reservations, preparedStatement);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -149,7 +171,6 @@ public abstract class Utils {
      * @param reservation la réservation a effectuer
      */
     public static void reserveSalle(Reservation reservation) {
-
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO reservation value(?,?,?,?)");
             preparedStatement.setInt(1, reservation.getSalle().getId());
@@ -222,11 +243,11 @@ public abstract class Utils {
         }
     }
 
-    public static String getPassword(String mail) {
+    public static String getPassword(String mail) throws IOException {
         String password = null;
         try {
 
-            PreparedStatement preparedStatement = connection.prepareStatement("select password from user where mail_user = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("select password from utilisateur where mail_user = ?");
             preparedStatement.setString(1, mail);
 
             ResultSet set = preparedStatement.executeQuery();
@@ -236,6 +257,8 @@ public abstract class Utils {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        if (password == null)
+            throw new IOException("Aucun compte utilisateur n'est relié à ce mail");
         return password;
     }
 
@@ -243,11 +266,17 @@ public abstract class Utils {
         return lastMail;
     }
 
-    public static Connection getConnection() {
-        return connection;
-    }
-
     public static Properties getProperties() {
         return properties;
+    }
+
+    public static void validMail(String mail) throws IOException {
+        InternetAddress address = new InternetAddress();
+        address.setAddress(mail);
+        try {
+            address.validate();
+        } catch (AddressException e) {
+            throw new IOException("L'email entré n'est pas un mail");
+        }
     }
 }

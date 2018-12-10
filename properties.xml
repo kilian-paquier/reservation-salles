@@ -4,6 +4,6 @@
 <comment>Sauvegarde</comment>
 <entry key="lastMail">kilian.paquier@hotmail.fr</entry>
 <entry key="password">password</entry>
-<entry key="bdd_url">jdbc:mysql://localhost/SALLE?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC</entry>
+<entry key="bdd_url">jdbc:mysql://localhost/SALLES?useUnicode=true&amp;useJDBCCompliantTimezoneShift=true&amp;useLegacyDatetimeCode=false&amp;serverTimezone=UTC</entry>
 <entry key="user">UtilisateurSalle</entry>
 </properties>

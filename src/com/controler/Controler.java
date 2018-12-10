@@ -38,6 +38,7 @@ public class Controler {
     private void opening() {
         connexion = new Connexion();
         connexion.getMailField().setText(Utils.getLastMail());
+
         connexion.getMdpForgot().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
@@ -58,23 +59,35 @@ public class Controler {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    logIn();
+                    try {
+                        logIn();
+                    } catch (IOException e1) {
+                        new Notification(connexion, "Erreur", e1.getMessage());
+                    }
                 }
             }
         });
 
-        connexion.getSeConnecterButton().addActionListener(e -> logIn());
+        connexion.getSeConnecterButton().addActionListener(e -> {
+            try {
+                logIn();
+            } catch (IOException e1) {
+                new Notification(connexion, "Erreur", e1.getMessage());
+            }
+        });
 
         connexion.open();
+        if (!connexion.getMailField().getText().equals(""))
+            connexion.getMdpField().requestFocusInWindow();
     }
 
-    private void logIn() {
+    private void logIn() throws IOException {
         String mail = connexion.getMailField().getText();
+        Utils.validMail(mail);
         String mdp = Utils.hashPassword(Arrays.toString(connexion.getMdpField().getPassword()));
-
         utilisateur = Utils.connectUser(mail, mdp);
         if (utilisateur == null)
-            new Notification(connexion, "Erreur", "Mot de passe ou mail invalide");
+            throw new IOException("Le nom d'utilisateur ou mot de passe invalide");
         else {
             try {
                 Utils.getProperties().setProperty("lastMail", mail);
@@ -88,7 +101,7 @@ public class Controler {
     }
 
     private void init() {
-        initListReservations();
+        initListReservations(null);
         initListSalles();
         initReservations();
         initBoxReservations();
@@ -97,14 +110,19 @@ public class Controler {
 
         mainView.getDeleteReservation().addActionListener(e -> deleteReservation());
         mainView.getAddReservation().addActionListener(e -> addReservation());
+        mainView.getSalleBoxReservation().addItemListener(e -> triReservation());
+    }
+
+    private void triReservation() {
+        if (String.valueOf(mainView.getSalleBoxReservation().getSelectedItem()).equals("Toutes les salles"))
+            initListReservations(null);
+        else
+            initListReservations(new Salle(String.valueOf(mainView.getSalleBoxReservation().getSelectedItem())));
     }
 
     private void actionForgot() {
         ForgotPassword forgotPassword = new ForgotPassword();
-        forgotPassword.getForgotButton().addActionListener(e -> {
-            String mail = forgotPassword.getMailField().getText();
-            System.out.println(Utils.getPassword(mail));
-        });
+        forgotPassword.getForgotButton().addActionListener(e -> sendPassword(forgotPassword));
 
         forgotPassword.addWindowListener(new WindowAdapter() {
             @Override
@@ -117,8 +135,7 @@ public class Controler {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    String mail = forgotPassword.getMailField().getText();
-                    System.out.println(Utils.getPassword(mail));
+                    sendPassword(forgotPassword);
                 }
             }
         });
@@ -126,14 +143,33 @@ public class Controler {
         forgotPassword.open();
     }
 
+    private void sendPassword(ForgotPassword forgotPassword) {
+        String mail = forgotPassword.getMailField().getText();
+        try {
+            System.out.println(Utils.getPassword(mail));
+        } catch (IOException e1) {
+            new Notification(forgotPassword, "Erreur", e1.getMessage());
+        }
+    }
+
     private void actionSignUp() {
         SignUp signUp = new SignUp();
-        signUp.getSignupButton().addActionListener(e -> register(signUp));
+        signUp.getSignupButton().addActionListener(e -> {
+            try {
+                register(signUp);
+            } catch (IOException e1) {
+                new Notification(signUp, "Erreur", e1.getMessage());
+            }
+        });
         signUp.getMdpField().addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    register(signUp);
+                    try {
+                        register(signUp);
+                    } catch (IOException e1) {
+                        new Notification(signUp, "Erreur", e1.getMessage());
+                    }
                 }
             }
         });
@@ -147,10 +183,11 @@ public class Controler {
         signUp.open();
     }
 
-    private void register(SignUp signUp) {
+    private void register(SignUp signUp) throws IOException {
         String prenom = signUp.getPrenomField().getText();
         String nom = signUp.getNomField().getText();
         String mail = signUp.getMailField().getText();
+        Utils.validMail(mail);
         String motDePasse = Utils.hashPassword(Arrays.toString(signUp.getMdpField().getPassword()));
         utilisateur = new Utilisateur(prenom, nom, mail, motDePasse);
         try {
@@ -166,7 +203,6 @@ public class Controler {
                 signUp.dispose();
                 connexion();
             } else {
-                new Notification(signUp, "Erreur", "Les champs ne peuvent pas être vide");
                 if (prenom.equals(""))
                     signUp.getPrenomField().setBorder(BorderFactory.createLineBorder(Color.red));
                 else
@@ -183,6 +219,7 @@ public class Controler {
                     signUp.getMdpField().setBorder(BorderFactory.createLineBorder(Color.red));
                 else
                     signUp.getMdpField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                throw new IOException("Les champs ne peuvent pas être vide");
             }
         } catch (SQLException e1) {
             new Notification(signUp, "Erreur", "L'email est déjà utilisé par un autre utilisateur");
@@ -207,7 +244,7 @@ public class Controler {
         mainView.getListSalle().setModel(defaultListModel);
     }
 
-    private void initListReservations() {
+    private void initListReservations(Salle salle) {
         DefaultTableModel defaultTableModel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -220,7 +257,11 @@ public class Controler {
         defaultTableModel.addColumn("Début");
         defaultTableModel.addColumn("Fin");
 
-        List<Reservation> reservations = Utils.checkAllReservations();
+        List<Reservation> reservations;
+        if (salle == null)
+            reservations = Utils.getAllReservations();
+        else
+            reservations = Utils.getReservations(salle);
 
         for (Reservation reservation : reservations) {
             Vector<String> data = new Vector<>();
@@ -279,8 +320,10 @@ public class Controler {
     }
 
     private void initBoxSalles() {
+        mainView.getSalleBoxReservation().addItem("Toutes les salles");
         for (Salle salle : Utils.getSalles()) {
             mainView.getBoxSalle().addItem(salle.getNomSalle());
+            mainView.getSalleBoxReservation().addItem(salle.getNomSalle());
         }
     }
 

@@ -14,6 +14,8 @@ public class MainView extends JFrame {
     private JComboBox<String> boxHeureFin;
     private JComboBox<String> reservationBox;
     private JButton deleteReservation;
+    private JComboBox<String> salleBoxReservation;
+    private JButton trierButton;
 
     public MainView() {
         setContentPane(globalPanel);
@@ -66,5 +68,13 @@ public class MainView extends JFrame {
 
     public JButton getDeleteReservation() {
         return deleteReservation;
+    }
+
+    public JButton getTrierButton() {
+        return trierButton;
+    }
+
+    public JComboBox<String> getSalleBoxReservation() {
+        return salleBoxReservation;
     }
 }

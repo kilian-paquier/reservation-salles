@@ -19,16 +19,17 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de données :  `salle`
+-- Base de données :  `salles`
 --
 drop database if exists salle;
-CREATE DATABASE IF NOT EXISTS `salle` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
+drop database if exists salles;
+CREATE DATABASE IF NOT EXISTS `salles` DEFAULT CHARACTER SET latin1 COLLATE latin1_swedish_ci;
 
 drop user if exists 'UtilisateurSalle'@'%';
 CREATE USER 'UtilisateurSalle'@'%' IDENTIFIED by 'password';
 GRANT USAGE ON *.* TO 'UtilisateurSalle'@'%';
 
-USE `salle`;
+USE `salles`;
 
 -- --------------------------------------------------------
 
@@ -82,11 +83,11 @@ INSERT INTO `salle` (`id_salle`, `nom_salle`) VALUES
 -- --------------------------------------------------------
 
 --
--- Structure de la table `user`
+-- Structure de la table `utilisateur`
 --
 
-DROP TABLE IF EXISTS `user`;
-CREATE TABLE IF NOT EXISTS `user` (
+DROP TABLE IF EXISTS `utilisateur`;
+CREATE TABLE IF NOT EXISTS `utilisateur` (
   `mail_user` varchar(255) NOT NULL,
   `nom_user` varchar(255) DEFAULT NULL,
   `prenom_user` varchar(255) DEFAULT NULL,
@@ -99,13 +100,12 @@ CREATE TABLE IF NOT EXISTS `user` (
 -- Déchargement des données de la table `user`
 --
 
-INSERT INTO `user` (`mail_user`, `nom_user`, `prenom_user`, `password`) VALUES
+INSERT INTO `utilisateur` (`mail_user`, `nom_user`, `prenom_user`, `password`) VALUES
 ('kilian.paquier@hotmail.fr', 'Paquier', 'Kilian', 'c532800644dae46ad38ed2711c96676851e9b8d4b8b3dbc7bb89829d42f09313');
-COMMIT;
 
-GRANT select on salle.salle to 'UtilisateurSalle'@'%';
-grant select on salle.user to 'UtilisateurSalle'@'%';
-grant select, insert, update, delete on salle.reservation to 'UtilisateurSalle'@'%';
+GRANT select on salles.salle to 'UtilisateurSalle'@'%';
+grant select, insert on salles.utilisateur to 'UtilisateurSalle'@'%';
+grant select, insert, update, delete on salles.reservation to 'UtilisateurSalle'@'%';
 commit;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
