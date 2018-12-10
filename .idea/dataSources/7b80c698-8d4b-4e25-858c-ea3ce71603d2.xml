@@ -929,86 +929,100 @@
     </column>
     <column id="234" parent="229" name="date_debut">
       <Position>3</Position>
-      <DataType>datetime|0s</DataType>
+      <DataType>date|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="235" parent="229" name="date_fin">
+    <column id="235" parent="229" name="heure_debut">
       <Position>4</Position>
-      <DataType>datetime|0s</DataType>
+      <DataType>varchar(255)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <index id="236" parent="229" name="ForeignUser">
+    <column id="236" parent="229" name="date_fin">
+      <Position>5</Position>
+      <DataType>date|0s</DataType>
+      <NotNull>1</NotNull>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <column id="237" parent="229" name="heure_fin">
+      <Position>6</Position>
+      <DataType>varchar(255)|0s</DataType>
+      <NotNull>1</NotNull>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <index id="238" parent="229" name="ForeignUser">
       <ColNames>mail_user</ColNames>
       <Type>btree</Type>
     </index>
-    <key id="237" parent="229" name="PRIMARY">
+    <key id="239" parent="229" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id_salle
 date_debut
-date_fin</ColNames>
+heure_debut
+date_fin
+heure_fin</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="238" parent="230" name="id_salle">
+    <column id="240" parent="230" name="id_salle">
       <Position>1</Position>
       <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="239" parent="230" name="nom_salle">
+    <column id="241" parent="230" name="nom_salle">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <index id="240" parent="230" name="salle_nom_salle_uindex">
+    <index id="242" parent="230" name="salle_nom_salle_uindex">
       <ColNames>nom_salle</ColNames>
       <Unique>1</Unique>
       <Type>btree</Type>
     </index>
-    <key id="241" parent="230" name="PRIMARY">
+    <key id="243" parent="230" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id_salle</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="242" parent="230" name="salle_nom_salle_uindex">
+    <key id="244" parent="230" name="salle_nom_salle_uindex">
       <ColNames>nom_salle</ColNames>
       <UnderlyingIndexName>salle_nom_salle_uindex</UnderlyingIndexName>
     </key>
-    <column id="243" parent="231" name="mail_user">
+    <column id="245" parent="231" name="mail_user">
       <Position>1</Position>
       <DataType>varchar(255)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="244" parent="231" name="nom_user">
+    <column id="246" parent="231" name="nom_user">
       <Position>2</Position>
       <DataType>varchar(255)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="245" parent="231" name="prenom_user">
+    <column id="247" parent="231" name="prenom_user">
       <Position>3</Position>
       <DataType>varchar(255)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="246" parent="231" name="password">
+    <column id="248" parent="231" name="password">
       <Position>4</Position>
       <DataType>varchar(255)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <index id="247" parent="231" name="USER_mail_user_uindex">
+    <index id="249" parent="231" name="USER_mail_user_uindex">
       <ColNames>mail_user</ColNames>
       <Unique>1</Unique>
       <Type>btree</Type>
     </index>
-    <key id="248" parent="231" name="PRIMARY">
+    <key id="250" parent="231" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>mail_user</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="249" parent="231" name="USER_mail_user_uindex">
+    <key id="251" parent="231" name="USER_mail_user_uindex">
       <ColNames>mail_user</ColNames>
       <UnderlyingIndexName>USER_mail_user_uindex</UnderlyingIndexName>
     </key>

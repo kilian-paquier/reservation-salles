@@ -214,7 +214,7 @@ public class Controler {
                     signUp.getMailField().setBorder(BorderFactory.createLineBorder(Color.red));
                 else
                     signUp.getMailField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
-                if (motDePasse.equals("4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"))
+                if (motDePasse.equals("4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945")) // Mot de passe vide
                     signUp.getMdpField().setBorder(BorderFactory.createLineBorder(Color.red));
                 else
                     signUp.getMdpField().setBorder(BorderFactory.createLineBorder(Color.lightGray));
@@ -266,8 +266,8 @@ public class Controler {
             Vector<String> data = new Vector<>();
             data.add(reservation.getUtilisateur().getPrenom() + " " + reservation.getUtilisateur().getNom());
             data.add(reservation.getSalle().getNomSalle());
-            data.add(reservation.getDateDebut().toString());
-            data.add(reservation.getDateFin().toString());
+            data.add(reservation.getDateDebut().toString() + " " + reservation.getHeureDebut().toString());
+            data.add(reservation.getDateFin().toString() + " " + reservation.getHeureFin().toString());
             defaultTableModel.addRow(data);
         }
 
@@ -293,6 +293,8 @@ public class Controler {
         Reservation reservation = new Reservation(utilisateur, salle, dateDeb, heureDebut, dateF, heurFin);
         try {
             utilisateur.addReservation(reservation);
+            new Notification(mainView, "Ok", "La réservation a bien été ajoutée");
+            initListReservations(null);
         } catch (Exception e) {
             new Notification(mainView, "Erreur", e.getMessage());
         }
@@ -359,6 +361,7 @@ public class Controler {
         Date debut = Date.valueOf(dateDebut);
 
         utilisateur.deleteReservation(nomSalle, debut);
+        new Notification(mainView, "Ok", "La réservation a bien été supprimée");
     }
 
     private void initReservations() {
