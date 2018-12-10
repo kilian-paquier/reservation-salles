@@ -54,6 +54,6 @@ public class Reservation {
 
     @Override
     public String toString() {
-        return salle.getNomSalle() + " le " + dateDebut.toString();
+        return salle.getNomSalle() + " le " + dateDebut.toString() + " à " + heureDebut.toString() + " jusqu'au " + dateFin.toString() + " à " + heureFin.toString();
     }
 }

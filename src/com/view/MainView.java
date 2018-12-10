@@ -1,5 +1,7 @@
 package com.view;
 
+import com.model.Reservation;
+
 import javax.swing.*;
 
 public class MainView extends JFrame {
@@ -12,10 +14,9 @@ public class MainView extends JFrame {
     private JButton addReservation;
     private JComboBox<String> boxHeureDebut;
     private JComboBox<String> boxHeureFin;
-    private JComboBox<String> reservationBox;
+    private JComboBox<Reservation> reservationBox;
     private JButton deleteReservation;
     private JComboBox<String> salleBoxReservation;
-    private JButton trierButton;
 
     public MainView() {
         setContentPane(globalPanel);
@@ -62,16 +63,12 @@ public class MainView extends JFrame {
         return boxHeureFin;
     }
 
-    public JComboBox<String> getReservationBox() {
+    public JComboBox<Reservation> getReservationBox() {
         return reservationBox;
     }
 
     public JButton getDeleteReservation() {
         return deleteReservation;
-    }
-
-    public JButton getTrierButton() {
-        return trierButton;
     }
 
     public JComboBox<String> getSalleBoxReservation() {
