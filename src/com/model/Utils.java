@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -73,8 +74,8 @@ public abstract class Utils {
     private static void addReservations(List<Reservation> reservations, PreparedStatement preparedStatement) throws SQLException {
         ResultSet set = preparedStatement.executeQuery();
         while (set.next()) {
-            reservations.add(new Reservation(new Utilisateur(set.getString(1), set.getString(0)), new Salle(set.getString(2)),
-                    set.getDate(3), set.getString(4), set.getDate(5), set.getString(6)));
+            reservations.add(new Reservation(new Utilisateur(set.getString(2), set.getString(1)), new Salle(set.getString(3)),
+                    set.getDate(4), set.getString(5), set.getDate(6), set.getString(7)));
         }
     }
 
@@ -126,7 +127,7 @@ public abstract class Utils {
                 set = preparedStatement.executeQuery();
                 while (set.next()) {
                     Salle salle = getSalle(set.getInt(1));
-                    user.addReservation(new Reservation(user, salle, set.getDate(3), set.getString(4), set.getDate(5), set.getString(6)));
+                    user.getReservations().add(new Reservation(user, salle, set.getDate(3), set.getString(4), set.getDate(5), set.getString(6)));
                 }
             }
         } catch (Exception e) {
@@ -153,11 +154,15 @@ public abstract class Utils {
     public static void addReservation(Reservation reservation) throws Exception {
         // TODO A modifier
         PreparedStatement preparedStatement1 = connection.prepareStatement("SELECT * FROM Reservation WHERE " +
-                "(date_debut between ? and ?) or (date_fin between ? and ?)");
+                "((date_debut between ? and ?) or (date_fin between ? and ?)) and ((heure_debut between ? and ?) or (heure_fin between ? and ?))");
         preparedStatement1.setDate(1, reservation.getDateDebut());
         preparedStatement1.setDate(2, reservation.getDateFin());
-        preparedStatement1.setDate(3, reservation.getDateDebut());
-        preparedStatement1.setDate(4, reservation.getDateFin());
+        preparedStatement1.setString(3, reservation.getHeureDebut().plusMinutes(1).toString());
+        preparedStatement1.setString(4, reservation.getHeureFin().minusMinutes(1).toString());
+        preparedStatement1.setDate(5, reservation.getDateDebut());
+        preparedStatement1.setDate(6, reservation.getDateFin());
+        preparedStatement1.setString(7, reservation.getHeureDebut().plusMinutes(1).toString());
+        preparedStatement1.setString(8, reservation.getHeureFin().minusMinutes(1).toString());
         ResultSet set = preparedStatement1.executeQuery();
         if (set.next())
             throw new Exception("Une réservation existe déjà sur la plage horaire sélectionnée");
@@ -186,19 +191,15 @@ public abstract class Utils {
      *
      * @param reservation la réservation a effectuer
      */
-    public static void reserveSalle(Reservation reservation) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO reservation value(?,?,?,?)");
-            preparedStatement.setInt(1, reservation.getSalle().getId());
-            preparedStatement.setString(2, reservation.getUtilisateur().getMail());
-            preparedStatement.setDate(3, reservation.getDateDebut());
-            preparedStatement.setDate(4, reservation.getDateFin());
-
-            preparedStatement.executeUpdate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void reserveSalle(Reservation reservation) throws Exception {
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO reservation value(?,?,?,?,?,?)");
+        preparedStatement.setInt(1, reservation.getSalle().getId());
+        preparedStatement.setString(2, reservation.getUtilisateur().getMail());
+        preparedStatement.setDate(3, reservation.getDateDebut());
+        preparedStatement.setString(4, reservation.getHeureDebut().toString());
+        preparedStatement.setDate(5, reservation.getDateFin());
+        preparedStatement.setString(6, reservation.getHeureFin().toString());
+        preparedStatement.executeUpdate();
     }
 
     /**
