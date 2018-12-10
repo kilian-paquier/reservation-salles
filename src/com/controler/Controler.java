@@ -293,6 +293,7 @@ public class Controler {
         Reservation reservation = new Reservation(utilisateur, salle, dateDeb, heureDebut, dateF, heurFin);
         try {
             utilisateur.addReservation(reservation);
+            initBoxReservations();
             new Notification(mainView, "Ok", "La réservation a bien été ajoutée");
             initListReservations(null);
         } catch (Exception e) {
@@ -349,6 +350,7 @@ public class Controler {
     }
 
     private void initBoxReservations() {
+        mainView.getReservationBox().removeAllItems();
         for (Reservation reservation : utilisateur.getReservations()) {
             mainView.getReservationBox().addItem(reservation.toString());
         }
@@ -361,6 +363,8 @@ public class Controler {
         Date debut = Date.valueOf(dateDebut);
 
         utilisateur.deleteReservation(nomSalle, debut);
+        initBoxReservations();
+        initListReservations(null);
         new Notification(mainView, "Ok", "La réservation a bien été supprimée");
     }
 
