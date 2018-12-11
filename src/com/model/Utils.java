@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.util.Date;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Properties;
 
 public abstract class Utils {
     private static Connection connection;
@@ -34,7 +36,7 @@ public abstract class Utils {
     }
 
 
-    public static Salle getSalle(int id_salle) {
+    private static Salle getSalle(int id_salle) {
         Salle salle = null;
         try {
             PreparedStatement statement = connection.prepareStatement("select * from salle where id_salle = ?");
@@ -148,8 +150,7 @@ public abstract class Utils {
         return reservations;
     }
 
-    public static void addReservation(Reservation reservation) throws Exception {
-        // TODO A modifier
+    static void addReservation(Reservation reservation) throws Exception {
         PreparedStatement preparedStatement1 = connection.prepareStatement("SELECT * FROM Reservation WHERE " +
                 "((date_debut between ? and ?) or (date_fin between ? and ?)) and ((heure_debut between ? and ?) or (heure_fin between ? and ?))");
         preparedStatement1.setDate(1, reservation.getDateDebut(), Calendar.getInstance());
@@ -168,19 +169,6 @@ public abstract class Utils {
         }
     }
 
-    public static List<Date> checkDispoDebutSalle(int id_salle, Date date) {
-        List<Date> dates_dispos = new ArrayList<>();
-
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT date_debut, date_fin from reservation where id_salle = ? " +
-                    "and date_debut like ?");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     /**
      * reservation d'une salle
      * Le début et la fin de réservation sont traités en précondition
@@ -188,7 +176,7 @@ public abstract class Utils {
      *
      * @param reservation la réservation a effectuer
      */
-    public static void reserveSalle(Reservation reservation) throws Exception {
+    private static void reserveSalle(Reservation reservation) throws Exception {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO reservation value(?,?,?,?,?,?)");
             preparedStatement.setInt(1, reservation.getSalle().getId());
@@ -209,7 +197,7 @@ public abstract class Utils {
      *
      * @param reservation la reservation a supprimer
      */
-    public static void annulerReservationSalle(Reservation reservation) {
+    static void annulerReservationSalle(Reservation reservation) {
         try {
             PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM reservation WHERE id_salle = ? and date_debut = ? and date_fin = ? and heure_debut = ? and heure_fin = ?");
             preparedStatement.setInt(1, reservation.getSalle().getId());
