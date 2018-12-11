@@ -264,7 +264,7 @@ public class Controler {
 
         for (Reservation reservation : reservations) {
             Vector<String> data = new Vector<>();
-            data.add(reservation.getUtilisateur().getPrenom() + " " + reservation.getUtilisateur().getNom());
+            data.add(reservation.getUtilisateur().getMail());
             data.add(reservation.getSalle().getNomSalle());
             data.add(reservation.getDateDebut().toString() + " " + reservation.getHeureDebut().toString());
             data.add(reservation.getDateFin().toString() + " " + reservation.getHeureFin().toString());

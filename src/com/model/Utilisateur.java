@@ -19,9 +19,8 @@ public class Utilisateur {
         reservations = new ArrayList<>();
     }
 
-    public Utilisateur(String prenom, String nom) {
-        this.prenom = prenom;
-        this.nom = nom;
+    public Utilisateur(String mail) {
+        this.mail = mail;
     }
 
     public String getPrenom() {

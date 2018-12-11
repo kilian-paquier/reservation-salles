@@ -24,7 +24,7 @@ public abstract class Utils {
      * @param prenom the firstname of the user
      */
     public static void registerUser(String nom, String prenom, String mail, String password) throws SQLException {
-        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO user(mail_user, nom_user, prenom_user, password) value (?,?,?,?)");
+        PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO utilisateur(mail_user, nom_user, prenom_user, password) value (?,?,?,?)");
         preparedStatement.setString(1, mail);
         preparedStatement.setString(2, nom);
         preparedStatement.setString(3, prenom);
@@ -57,7 +57,7 @@ public abstract class Utils {
 
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT nom_user, prenom_user, nom_salle, date_debut, heure_debut, date_fin, heure_fin FROM " +
+                    "SELECT mail_user, nom_salle, date_debut, heure_debut, date_fin, heure_fin FROM " +
                             "(utilisateur INNER JOIN reservation ON utilisateur.mail_user = reservation.mail_user) INNER JOIN salle" +
                             " ON salle.id_salle = reservation.id_salle where salle.nom_salle = ?");
             preparedStatement.setString(1, salle.getNomSalle());
@@ -73,8 +73,10 @@ public abstract class Utils {
     private static void addReservations(List<Reservation> reservations, PreparedStatement preparedStatement) throws SQLException {
         ResultSet set = preparedStatement.executeQuery();
         while (set.next()) {
-            reservations.add(new Reservation(new Utilisateur(set.getString(2), set.getString(1)), new Salle(set.getString(3)),
-                    set.getDate(4), set.getString(5), set.getDate(6), set.getString(7)));
+            Utilisateur utilisateur = new Utilisateur(set.getString(1));
+            Salle salle = new Salle(set.getString(2));
+
+            reservations.add(new Reservation(utilisateur, salle, set.getDate(3), set.getString(4), set.getDate(5), set.getString(6)));
         }
     }
 
@@ -139,7 +141,7 @@ public abstract class Utils {
         List<Reservation> reservations = new ArrayList<>();
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(
-                    "SELECT nom_user, prenom_user, nom_salle, date_debut, heure_debut, date_fin, heure_fin FROM " +
+                    "SELECT reservation.mail_user, nom_salle, date_debut, heure_debut, date_fin, heure_fin FROM " +
                             "(utilisateur INNER JOIN reservation ON utilisateur.mail_user = reservation.mail_user) INNER JOIN salle" +
                             " ON salle.id_salle = reservation.id_salle");
             addReservations(reservations, preparedStatement);
