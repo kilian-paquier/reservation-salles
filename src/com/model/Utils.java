@@ -7,10 +7,8 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.*;
-import java.time.temporal.TemporalUnit;
-import java.util.*;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 
 public abstract class Utils {
     private static Connection connection;
