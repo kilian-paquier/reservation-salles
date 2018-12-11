@@ -1,0 +1,39 @@
+<html>
+<head>
+<meta charset='utf-8'>
+<style>
+  #mld .relation { font-variant: small-caps; font-weight: bold }
+  #mld .primary { text-decoration: underline }
+  #mld .foreign { font-style: oblique }
+  #mld .normal { }
+</style>
+</head>
+<body>
+<div id='mld'>
+<div>
+  <span class='relation'>UTILISATEUR</span> (
+    <span class='primary'>mail_user</span>,
+    <span class='normal'>nom_user</span>,
+    <span class='normal'>prenom_user</span>,
+    <span class='normal'>password</span>
+  )
+</div>
+<div>
+  <span class='relation'>RESERVATION</span> (
+    <span class='foreign primary'>mail_user</span>,
+    <span class='foreign primary'>id_salle</span>,
+    <span class='normal'>date_debut</span>,
+    <span class='normal'>heure_debut</span>,
+    <span class='normal'>date_fin</span>,
+    <span class='normal'>heure_fin</span>
+  )
+</div>
+<div>
+  <span class='relation'>SALLE</span> (
+    <span class='primary'>id_salle</span>,
+    <span class='normal'>nom_salle</span>
+  )
+</div>
+</div>
+</body>
+</html>
