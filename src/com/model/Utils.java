@@ -9,9 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.time.temporal.TemporalUnit;
 import java.util.*;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 
 public abstract class Utils {
     private static Connection connection;

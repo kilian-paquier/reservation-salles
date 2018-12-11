@@ -330,6 +330,8 @@ public class Controler {
         mainView.getBoxHeureFin().removeAllItems();
         if (String.valueOf(mainView.getBoxJourDebut().getSelectedItem()).equals(String.valueOf(mainView.getBoxJourFin().getSelectedItem()))) {
             LocalTime inTime = LocalTime.parse((CharSequence) Objects.requireNonNull(mainView.getBoxHeureDebut().getSelectedItem()));
+            if (inTime.equals(LocalTime.of(22, 0)))
+                mainView.getBoxJourFin().setSelectedIndex(mainView.getBoxJourFin().getSelectedIndex() + 1);
             while ((inTime = inTime.plusHours(1)).getHour() <= 22) {
                 mainView.getBoxHeureFin().addItem(inTime.toString());
             }
